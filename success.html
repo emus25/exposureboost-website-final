@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order Complete — ExposureBoost</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#0d0720;
+  color:#fff;
+}
+
+.container{
+  max-width:700px;
+  margin:40px auto;
+  padding:20px;
+}
+
+.card{
+  background:#18083A;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  padding:30px;
+}
+
+.success{
+  color:#4ade80;
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.order-ref{
+  color:#f0b429;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+p{
+  line-height:1.6;
+}
+
+.upload-box{
+  margin-top:30px;
+  padding:25px;
+  border:2px dashed rgba(255,255,255,.2);
+  border-radius:12px;
+  text-align:center;
+}
+
+input[type=file]{
+  margin:20px 0;
+  color:#fff;
+}
+
+button{
+  background:#f0b429;
+  color:#000;
+  border:none;
+  padding:14px 28px;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+.status{
+  margin-top:20px;
+  font-weight:bold;
+}
+
+.hidden{
+  display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="card">
+
+    <div class="success">
+      ✓ Payment Successful
+    </div>
+
+    <p>
+      Thank you for your order with ExposureBoost.
+    </p>
+
+    <div class="order-ref" id="orderRef">
+      Loading...
+    </div>
+
+    <p>
+      Upload your logo below so we can begin production.
+    </p>
+
+    <div class="upload-box">
+
+      <input type="file" id="logo" accept="image/*">
+
+      <br>
+
+      <button id="uploadBtn">
+        Upload Logo
+      </button>
+
+      <div class="status" id="status"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const WORKER =
+  "https://exposureboost-checkout.ediz-7b9.workers.dev";
+
+let sessionData = null;
+
+async function loadOrder() {
+
+  const params = new URLSearchParams(window.location.search);
+
+  const sessionId = params.get("session_id");
+
+  if (!sessionId) {
+    document.getElementById("orderRef").innerText =
+      "Missing order reference";
+    return;
+  }
+
+  const res = await fetch(
+    WORKER + "/session?session_id=" + encodeURIComponent(sessionId)
+  );
+
+  sessionData = await res.json();
+
+  if (sessionData.status !== "success") {
+    document.getElementById("orderRef").innerText =
+      "Unable to load order";
+    return;
+  }
+
+  document.getElementById("orderRef").innerText =
+    "Order Reference: " +
+    sessionData.order_reference;
+}
+
+document
+.getElementById("uploadBtn")
+.addEventListener("click", async () => {
+
+  const file =
+    document.getElementById("logo").files[0];
+
+  if (!file) {
+    alert("Please choose a logo file.");
+    return;
+  }
+
+  if (!sessionData) {
+    alert("Order information not loaded.");
+    return;
+  }
+
+  const status =
+    document.getElementById("status");
+
+  status.innerText = "Uploading...";
+
+  const form = new FormData();
+
+  form.append(
+    "session_id",
+    sessionData.session_id
+  );
+
+  form.append(
+    "order_reference",
+    sessionData.order_reference
+  );
+
+  form.append(
+    "name",
+    sessionData.name || ""
+  );
+
+  form.append(
+    "company",
+    sessionData.name || ""
+  );
+
+  form.append(
+    "products",
+    sessionData.products || ""
+  );
+
+  form.append(
+    "logo",
+    file
+  );
+
+  try {
+
+    const res = await fetch(
+      WORKER + "/upload-logo",
+      {
+        method: "POST",
+        body: form
+      }
+    );
+
+    const result = await res.json();
+
+    if (result.status === "success") {
+
+      status.style.color = "#4ade80";
+
+      status.innerText =
+        "✓ Logo uploaded successfully. We can now begin production.";
+
+    } else {
+
+      status.style.color = "#ff6b6b";
+
+      status.innerText =
+        result.message || "Upload failed.";
+
+    }
+
+  } catch (err) {
+
+    status.style.color = "#ff6b6b";
+
+    status.innerText =
+      "Upload failed. Please try again.";
+
+  }
+
+});
+
+loadOrder();
+
+</script>
+
+</body>
+</html>

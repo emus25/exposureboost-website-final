@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ExposureBoost — The business card people don't forget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* hero palette (original) */
+    --bg-top: #0a0518;
+    --bg-mid: #120a26;
+    --purple: #6d3fd1;
+    --purple-soft: #8b6fd9;
+    --purple-line: rgba(140, 110, 220, 0.35);
+    --gold: #f0b429;
+    --gold-deep: #d99a1f;
+    --white: #ffffff;
+    --grey: #9b96b3;
+    --grey-dim: #7a7591;
+    /* light/dark sections */
+    --dp-bg:#0E0620; --dp-surface:#18083A; --dp-footer:#07041A;
+    --dp-border:rgba(192,144,216,0.14); --dp-primary:#66289E; --dp-light:#C090D8;
+    --lp-bg:#F8F5F2; --lp-surface:#EFECEA; --lp-border:rgba(14,6,32,0.08);
+    --lp-heading:#140A20; --lp-body:#5C5060;
+    --whatsapp:#25D366;
+    --font-display:'Space Grotesk', system-ui, sans-serif;
+    --font-body:system-ui, -apple-system, sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html, body{ width:100%; overflow-x:hidden; }
+  body{ font-family: 'Helvetica Neue', Arial, sans-serif; background:#060310; }
+
+  /* ============================================================
+     BREAKPOINT SWITCH (hero only)
+     ============================================================ */
+  .mobile-view{ display: flex; }
+  .desktop-view{ display: none; }
+  @media (min-width: 900px){
+    .mobile-view{ display: none; }
+    .desktop-view{ display: flex; }
+  }
+
+  /* ============================================================
+     MOBILE VIEW STYLES (original hero)
+     ============================================================ */
+  .mobile-view {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #060310;
+    color: var(--white);
+    width: 100%;
+    min-height: 100%;
+  }
+  .mobile-view .page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: radial-gradient(120% 60% at 50% 0%, var(--bg-mid) 0%, var(--bg-top) 55%, #060310 100%);
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mobile-view header {
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mobile-view .logo { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .mobile-view .logo-icon {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border: 1.5px solid var(--gold); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mobile-view .logo-text { font-size: 14px; font-weight: 800; letter-spacing: 0.3px; white-space: nowrap; }
+  .mobile-view .logo-text .boost { color: var(--gold); font-weight: 800; }
+  .mobile-view .order-btn {
+    background: var(--gold); color: #1a1206; font-weight: 700; font-size: 13px;
+    border: none; padding: 9px 16px; border-radius: 8px; white-space: nowrap;
+  }
+  .mobile-view .header-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .mobile-view .menu-icon { display: flex; flex-direction: column; gap: 4px; cursor: pointer; position: relative; z-index: 60; }
+  .mobile-view .menu-icon span { width: 20px; height: 2px; background: var(--white); display: block; border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+  .mobile-view .menu-icon.is-open span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+  .mobile-view .menu-icon.is-open span:nth-child(2){ opacity: 0; }
+  .mobile-view .menu-icon.is-open span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+
+  /* ---------- MOBILE DROPDOWN MENU ---------- */
+  .mobile-view .mobile-menu {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+    background: #0c0720; border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: calc(60px + env(safe-area-inset-top)) 20px 18px;
+    display: flex; flex-direction: column;
+    transform: translateY(-100%); opacity: 0; visibility: hidden;
+    transition: transform .28s ease, opacity .2s ease, visibility .28s;
+    box-shadow: 0 24px 40px -20px rgba(0,0,0,0.7);
+  }
+  .mobile-view .mobile-menu.open { transform: translateY(0); opacity: 1; visibility: visible; }
+  .mobile-view .mobile-menu a {
+    color: var(--white); text-decoration: none; font-size: 16px; font-weight: 600;
+    padding: 14px 6px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .mobile-view .mobile-menu a:last-child { border-bottom: none; }
+
+  /* ---------- HERO ---------- */
+  .mobile-view .hero {
+    flex: 1 1 auto; min-height: 0; width: 100%; text-align: center;
+    padding: clamp(6px, 1.6vh, 16px) 20px clamp(8px, 1.6vh, 16px);
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    gap: clamp(4px, 1.2vh, 14px); overflow: hidden;
+  }
+  .mobile-view .text-block { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+  .mobile-view .eyebrow { color: #d9b8ec; font-size: clamp(10px, 2.2vh, 13px); letter-spacing: 1px; font-weight: 400; }
+  .mobile-view h1 {
+    margin-top: clamp(4px, 1.1vh, 12px);
+    font-size: min(8.4vw, clamp(20px, 5.6vh, 36px));
+    line-height: 1.12; font-weight: 800; letter-spacing: -0.3px; max-width: 480px;
+  }
+  .mobile-view h1 .accent { color: var(--gold); }
+  .mobile-view .subhead {
+    margin-top: clamp(4px, 1.1vh, 12px); color: var(--grey);
+    font-size: clamp(11px, 2.4vh, 15px); font-weight: 400; max-width: 380px;
+  }
+
+  /* ---------- PHONE / CARD VISUAL ---------- */
+  .mobile-view .visual {
+    position: relative; width: auto; height: clamp(180px, 46vh, 320px);
+    max-width: 64vw; aspect-ratio: 423 / 833; flex-shrink: 1;
+  }
+  .mobile-view .phone {
+    position: absolute; inset: 0; border: 2px solid #6e4e8c; border-radius: 32px;
+    background: rgba(15, 8, 30, 0.4); overflow: visible;
+  }
+  .mobile-view .phone::after {
+    content:""; position:absolute; inset: 0; border-radius: 32px;
+    background: radial-gradient(70% 46% at 54% 60%, rgba(78, 40, 130, 0.7) 0%, rgba(60, 28, 105, 0.45) 30%, rgba(40, 18, 75, 0.28) 55%, rgba(20, 9, 45, 0.1) 80%, transparent 100%);
+  }
+  .mobile-view .phone::before {
+    content:""; position:absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 28%; height: 5px; border-radius: 4px; background: rgba(160, 130, 220, 0.45); z-index: 2;
+  }
+  .mobile-view .nfc-wrap {
+    position: absolute; top: 26%; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 2;
+  }
+  .mobile-view .nfc-icon { width: 18%; height: auto; }
+  .mobile-view .ready-text { color: #b287d4; font-size: 14px; font-weight: 500; }
+  .mobile-view .biz-card {
+    position: absolute; bottom: -6%; left: 18%; width: 92%; aspect-ratio: 1.62 / 1; border-radius: 12px;
+    background: linear-gradient(155deg, #f7c948 0%, #eeac1f 55%, #e0991a 100%);
+    transform: rotate(-4.3deg); transform-origin: bottom left;
+    box-shadow: 0 20px 40px -8px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.4);
+    padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; z-index: 3;
+  }
+  .mobile-view .biz-card::before {
+    content:""; position:absolute; inset:0; border-radius: 12px;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.10) 0px, rgba(255,255,255,0.10) 1px, transparent 1px, transparent 11%);
+    pointer-events:none;
+  }
+  .mobile-view .chip { width: 22px; height: 16px; border-radius: 4px; background: rgba(60, 40, 5, 0.55); }
+  .mobile-view .card-bottom-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; }
+  .mobile-view .card-name { font-size: 14px; font-weight: 800; color: #241704; }
+  .mobile-view .card-role { font-size: 10px; color: #4a350c; margin-top: 2px; }
+  .mobile-view .card-nfc { width: 20px; height: auto; flex-shrink: 0; opacity: 0.75; }
+
+  /* ---------- TAP-TO-REVEAL ANIMATION ---------- */
+  .mobile-view .biz-card { cursor: pointer; transition: transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+  .mobile-view .biz-card.is-tapped { transform: rotate(-1deg) scale(1.04) translateY(-2%); }
+  .mobile-view .nfc-wrap { transition: opacity 0.35s ease, transform 0.35s ease; }
+  .mobile-view .phone.is-active .nfc-wrap { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+  .mobile-view .ripple {
+    position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 199, 255, 0.9) 0%, rgba(160, 110, 230, 0.55) 38%, rgba(120, 70, 190, 0) 72%);
+    z-index: 2; pointer-events: none; opacity: 0;
+  }
+  .mobile-view .ripple.is-rippling { animation: ripple-expand 0.9s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes ripple-expand {
+    0%   { opacity: 0.9; transform: scale(0); }
+    60%  { opacity: 0.5; }
+    100% { opacity: 0; transform: scale(22); }
+  }
+  .mobile-view .phone::after { transition: opacity 0.5s ease, filter 0.5s ease; }
+  .mobile-view .phone.is-active::after { opacity: 1.4; filter: saturate(1.3) brightness(1.15); }
+
+  /* ---------- MULTI-STAGE DEMO PANELS ---------- */
+  .mobile-view .demo-stage {
+    position: absolute; top: 8%; left: 8%; right: 8%; z-index: 2;
+    display: flex; flex-direction: column; gap: 6%;
+    opacity: 0; transform: translateY(10px) scale(0.97);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(.2,.8,.3,1); pointer-events: none;
+  }
+  .mobile-view .demo-stage.is-visible { opacity: 1; transform: translateY(0) scale(1); transition-delay: 0.2s; }
+  .mobile-view .rev-header {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4%;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; padding: 7% 8%;
+  }
+  .mobile-view .rev-header-text { min-width: 0; max-width: 100%; overflow: hidden; }
+  .mobile-view .rev-name { font-size: clamp(10px, 2.4vh, 13px); font-weight: 800; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mobile-view .rev-role { font-size: clamp(8px, 1.7vh, 10px); color: var(--grey); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mobile-view .rev-rating { font-size: clamp(8px, 1.7vh, 10px); font-weight: 700; color: var(--gold); background: rgba(240, 180, 41, 0.12); border-radius: 20px; padding: 3px 8px; white-space: nowrap; flex-shrink: 0; }
+  .mobile-view .rev-row {
+    display: flex; align-items: center; gap: 8%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 9px; padding: 7% 9%;
+  }
+  .mobile-view .rev-icon { width: 22px; height: 22px; flex-shrink: 0; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .mobile-view .rev-icon.gold { background: var(--gold); }
+  .mobile-view .rev-icon.purple { background: var(--purple); }
+  .mobile-view .rev-label { font-size: clamp(8px, 1.9vh, 10px); color: var(--grey); }
+  .mobile-view .rev-value { margin-top: 3px; height: 6px; width: 60%; border-radius: 4px; background: rgba(255,255,255,0.22); }
+  .mobile-view .rev-action {
+    align-self: center; margin-top: 1%; background: var(--gold); color: #1a1206;
+    font-size: clamp(9px, 2vh, 11px); font-weight: 700; border: none; border-radius: 9px;
+    padding: 6% 14%; text-align: center; white-space: nowrap;
+  }
+  .mobile-view .save-confirm { align-items: center; text-align: center; justify-content: center; gap: 5%; }
+  .mobile-view .save-check { width: 34px; height: 34px; border-radius: 50%; background: rgba(50, 200, 120, 0.16); border: 1.5px solid rgba(78, 224, 138, 0.5); display: flex; align-items: center; justify-content: center; }
+  .mobile-view .save-confirm-title { font-size: clamp(10px, 2.2vh, 13px); font-weight: 800; color: var(--white); white-space: nowrap; }
+  .mobile-view .save-confirm-sub { font-size: clamp(7.5px, 1.6vh, 9.5px); color: var(--grey); white-space: nowrap; margin-top: -2%; }
+  .mobile-view .review-stage { align-items: center; text-align: center; justify-content: center; gap: 6%; }
+  .mobile-view .review-title { font-size: clamp(9px, 2vh, 12px); font-weight: 700; color: var(--white); white-space: nowrap; }
+  .mobile-view .review-stars { display: flex; justify-content: center; gap: 4%; width: 100%; }
+  .mobile-view .review-stars span { font-size: min(5.4vw, 22px); line-height: 1; color: rgba(255,255,255,0.18); transition: color 0.25s ease, transform 0.25s cubic-bezier(.34,1.56,.64,1); transform: scale(0.7); flex: 0 0 auto; }
+  .mobile-view .review-stars span.lit { color: var(--gold); transform: scale(1); }
+  .mobile-view .review-thanks { font-size: clamp(7.5px, 1.6vh, 9.5px); color: #7be3a8; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap; }
+  .mobile-view .review-thanks.is-shown { opacity: 1; }
+  .mobile-view .customise-stage { text-align: center; align-items: center; gap: 5%; }
+  .mobile-view .customise-title { font-size: clamp(10px, 2.1vh, 13px); font-weight: 800; color: var(--white); white-space: nowrap; }
+  .mobile-view .customise-sub { font-size: clamp(7.5px, 1.6vh, 9.5px); color: var(--grey); white-space: nowrap; }
+  .mobile-view .customise-row { width: 100%; display: flex; align-items: center; gap: 6%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10); border-radius: 9px; padding: 6% 8%; }
+  .mobile-view .swatch { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.5); }
+  .mobile-view .customise-row .rev-label { flex: 1; text-align: left; }
+  .mobile-view .customise-cursor {
+    position: absolute; width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(255,255,255,0.9); box-shadow: 0 0 0 4px rgba(255,255,255,0.18);
+    top: 30%; left: 70%; opacity: 0;
+    transition: opacity 0.3s ease, top 0.5s cubic-bezier(.3,.7,.3,1), left 0.5s cubic-bezier(.3,.7,.3,1);
+  }
+  .mobile-view .phone[data-stage="4"] .customise-cursor.is-active { opacity: 1; top: 62%; left: 28%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-view .biz-card,
+    .mobile-view .nfc-wrap,
+    .mobile-view .phone::after,
+    .mobile-view .demo-stage,
+    .mobile-view .review-stars span,
+    .mobile-view .customise-cursor { transition: none !important; }
+    .mobile-view .ripple.is-rippling { animation: none !important; }
+  }
+
+  .mobile-view .footer-group { width: 100%; max-width: 400px; flex-shrink: 0; }
+  .mobile-view .cta-row { display: flex; gap: 10px; }
+  .mobile-view .btn { flex: 1; padding: clamp(10px, 1.8vh, 14px) 0; border-radius: 10px; font-size: clamp(12px, 2.6vh, 14px); font-weight: 700; text-align: center; border: none; cursor: pointer; }
+  .mobile-view .btn-primary { background: var(--gold); color: #1a1206; }
+  .mobile-view .btn-secondary { background: transparent; color: var(--white); border: 1.5px solid var(--purple-line); }
+  .mobile-view .footnote { text-align: center; color: var(--grey-dim); font-size: clamp(10px, 2.2vh, 12px); margin-top: clamp(8px, 1.6vh, 14px); }
+  .mobile-view .footnote .dot { margin: 0 8px; }
+
+  /* ============================================================
+     DESKTOP VIEW STYLES (original hero)
+     ============================================================ */
+  .desktop-view {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background:
+      radial-gradient(60% 50% at 82% 20%, rgba(109,63,209,0.20) 0%, transparent 60%),
+      linear-gradient(160deg, #0d0720 0%, #0a0518 55%, #060310 100%);
+    color: var(--white);
+    min-height: 100vh; min-height: 100dvh;
+    flex-direction: column;
+  }
+  .desktop-view .hero {
+    position: relative; overflow: hidden; flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column;
+    background-image:
+      linear-gradient(rgba(140,110,220,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140,110,220,0.05) 1px, transparent 1px);
+    background-size: 42px 42px; background-position: center top;
+  }
+  .desktop-view nav {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 56px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative; z-index: 5; background: rgba(8, 4, 20, 0.6); backdrop-filter: blur(6px);
+  }
+  .desktop-view .logo { display: flex; align-items: center; gap: 11px; }
+  .desktop-view .logo-icon { width: 34px; height: 34px; border: 1.5px solid var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .desktop-view .logo-text { font-size: 18px; font-weight: 800; letter-spacing: 0.3px; }
+  .desktop-view .logo-text .boost { color: var(--gold); }
+  .desktop-view .nav-links { display: flex; align-items: center; gap: 40px; list-style: none; }
+  .desktop-view .nav-links a { color: var(--grey); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s ease; }
+  .desktop-view .nav-links a:hover { color: var(--white); }
+  .desktop-view .nav-right { display: flex; align-items: center; gap: 26px; }
+  .desktop-view .nav-signin { color: var(--grey); text-decoration: none; font-size: 14.5px; font-weight: 600; white-space: nowrap; transition: color 0.2s ease; }
+  .desktop-view .nav-signin:hover { color: var(--white); }
+  .desktop-view .nav-cta { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%); color: #1a1206; border: none; font-weight: 700; font-size: 14.5px; padding: 12px 24px; border-radius: 9px; cursor: pointer; white-space: nowrap; }
+  .desktop-view .hero-inner {
+    position: relative; z-index: 2; flex: 1 1 auto; min-height: 0;
+    display: grid; grid-template-columns: 1fr 480px; align-items: center; gap: 40px;
+    max-width: 1320px; width: 100%; margin: 0 auto; padding: 0 56px;
+  }
+  .desktop-view .hero-copy { max-width: 560px; }
+  .desktop-view .eyebrow { color: var(--purple-soft); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; }
+  .desktop-view h1 { font-size: 56px; line-height: 1.08; font-weight: 800; letter-spacing: -1px; margin-bottom: 24px; }
+  .desktop-view h1 .accent { color: var(--gold); position: relative; }
+  .desktop-view h1 .accent::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: 6px; height: 10px; background: rgba(240,180,41,0.18); z-index: -1; border-radius: 3px; }
+  .desktop-view .subhead { color: var(--grey); font-size: 18px; line-height: 1.6; margin-bottom: 38px; max-width: 480px; }
+  .desktop-view .hero-ctas { display: flex; align-items: center; gap: 16px; }
+  .desktop-view .btn-primary { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%); color: #1a1206; border: none; font-weight: 700; font-size: 15.5px; padding: 16px 26px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 16px 32px -10px rgba(240,180,41,0.35); }
+  .desktop-view .btn-secondary { background: transparent; color: var(--white); border: 1.5px solid var(--purple-line); font-weight: 600; font-size: 15.5px; padding: 16px 24px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 9px; }
+  .desktop-view .play-dot { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--purple-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .desktop-view .trust-row { margin-top: 56px; display: flex; align-items: center; gap: 14px; }
+  .desktop-view .trust-row span { color: var(--grey-dim); font-size: 13.5px; }
+  .desktop-view .trust-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--grey-dim); }
+  .desktop-view .phone-wrap { position: relative; justify-self: center; width: clamp(220px, 34vh, 320px); height: clamp(420px, 65vh, 610px); }
+  .desktop-view .phone { position: absolute; inset: 0; border: 2px solid var(--purple-line); border-radius: 46px; background: linear-gradient(180deg, #15102c 0%, #0d0822 100%); box-shadow: 0 50px 100px -30px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02); overflow: hidden; }
+  .desktop-view .phone::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: radial-gradient(70% 60% at 50% 0%, rgba(109,63,209,0.35) 0%, transparent 75%); }
+  .desktop-view .notch { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 90px; height: 26px; background: #050208; border-radius: 14px; z-index: 3; }
+  .desktop-view .phone-screen { position: absolute; top: 58px; left: 18px; right: 18px; bottom: 18px; z-index: 2; }
+  .desktop-view .screen-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .desktop-view .mini-logo { width: 26px; height: 26px; border: 1.2px solid var(--gold); border-radius: 6px; }
+  .desktop-view .lang-pill { font-size: 11px; font-weight: 700; color: var(--grey); border: 1px solid var(--purple-line); padding: 4px 10px; border-radius: 20px; }
+  .desktop-view .profile-bar { background: linear-gradient(135deg, var(--purple) 0%, #4f2aa8 100%); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .desktop-view .profile-bar .name { font-size: 15px; font-weight: 700; }
+  .desktop-view .profile-bar .role { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .desktop-view .rating-pill { background: rgba(255,255,255,0.18); font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 20px; display: flex; align-items: center; gap: 3px; }
+  .desktop-view .tab-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .desktop-view .tab { flex: 1; text-align: center; font-size: 11.5px; font-weight: 600; padding: 9px 0; border-radius: 9px; color: var(--grey); background: rgba(255,255,255,0.04); }
+  .desktop-view .tab.active { background: var(--purple); color: var(--white); }
+  .desktop-view .contact-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); border-radius: 13px; padding: 12px; margin-bottom: 10px; }
+  .desktop-view .contact-icon { width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .desktop-view .icon-call { background: linear-gradient(135deg, #f0b429, #d99a1f); }
+  .desktop-view .icon-mail { background: linear-gradient(135deg, #6d3fd1, #4f2aa8); }
+  .desktop-view .contact-detail .label { font-size: 12.5px; font-weight: 700; }
+  .desktop-view .contact-detail .value { height: 6px; width: 90px; background: rgba(255,255,255,0.12); border-radius: 3px; margin-top: 7px; }
+  .desktop-view .badge-saved { position: absolute; background: rgba(34,197,148,0.14); border: 1px solid rgba(34,197,148,0.4); color: #4ade9b; font-size: 10.5px; font-weight: 700; padding: 7px 12px; border-radius: 20px; bottom: 16px; left: 16px; display: flex; align-items: center; gap: 6px; }
+  .desktop-view .badge-saved::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #4ade9b; }
+  .desktop-view .floating-card { position: absolute; width: 142px; height: 90px; right: -38px; bottom: -28px; border-radius: 12px; background: linear-gradient(155deg, #f7c948 0%, #eeac1f 55%, #e0991a 100%); transform: rotate(-8deg); box-shadow: 0 24px 48px -12px rgba(0,0,0,0.55); padding: 12px 13px; z-index: 4; }
+  .desktop-view .floating-card .fc-icon { width: 22px; height: 22px; border: 1.2px solid rgba(36,23,4,0.5); border-radius: 5px; }
+  .desktop-view .floating-card .fc-text { position: absolute; bottom: 11px; left: 13px; font-size: 11px; font-weight: 800; color: #241704; letter-spacing: 0.3px; }
+  @media (max-width: 980px){
+    .desktop-view .hero-inner { grid-template-columns: 1fr; padding: 64px 28px 80px; text-align: center; }
+    .desktop-view .hero-copy { max-width: 100%; margin: 0 auto; }
+    .desktop-view .hero-ctas { justify-content: center; }
+    .desktop-view .trust-row { justify-content: center; }
+    .desktop-view .phone-wrap { margin: 56px auto 0; }
+    .desktop-view nav { padding: 18px 24px; }
+    .desktop-view .nav-links { display: none; }
+    .desktop-view h1 { font-size: 40px; }
+  }
+
+  /* ============================================================
+     LIGHT SECTIONS BELOW THE HERO (scoped under .site)
+     ============================================================ */
+  .site{ background:var(--lp-bg); color:var(--lp-body); font-family:var(--font-body); font-size:16px; line-height:1.6; }
+  .site img{ max-width:100%; display:block; }
+  .site a{ text-decoration:none; color:inherit; }
+  .site h2,.site h3,.site h4{ font-family:var(--font-display); color:var(--lp-heading); line-height:1.15; }
+  .site .wrap{ width:100%; max-width:1140px; margin:0 auto; padding:0 18px; }
+  .site .section{ padding:44px 0; }
+  .site .sec-head{ text-align:center; max-width:640px; margin:0 auto 26px; }
+  .site .eyebrow{ display:inline-block; font-family:var(--font-display); font-weight:600; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--dp-primary); margin-bottom:10px; }
+  .site .sec-head h2{ font-size:26px; font-weight:700; letter-spacing:-0.5px; }
+  .site .sec-head h2 .accent{ color:var(--gold); }
+  .site .sec-head p{ font-size:16px; margin-top:10px; color:var(--lp-body); }
+  .site .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 22px; border-radius:12px; border:none; cursor:pointer; font-family:var(--font-display); font-weight:700; font-size:16px; transition:transform .12s ease; -webkit-tap-highlight-color:transparent; }
+  .site .btn:active{ transform:scale(.97); }
+  .site .btn-gold{ background:var(--gold); color:#231702; box-shadow:0 12px 26px -10px rgba(240,180,41,.5); }
+  .site .btn-wa{ background:var(--whatsapp); color:#04361b; }
+  .site .btn-block{ display:flex; width:100%; }
+
+  .site .stats{ background:var(--lp-surface); border-bottom:1px solid var(--lp-border); }
+  .site .stats-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:2px; background:var(--lp-border); border-radius:16px; overflow:hidden; }
+  .site .stat{ background:var(--lp-surface); padding:18px 12px; text-align:center; }
+  .site .stat .num{ font-family:var(--font-display); font-weight:700; font-size:26px; color:var(--lp-heading); line-height:1; }
+  .site .stat .num b{ color:var(--gold); }
+  .site .stat .lbl{ font-size:12px; color:var(--lp-body); margin-top:6px; letter-spacing:.3px; }
+
+  .site .steps{ display:flex; flex-direction:column; gap:12px; margin-bottom:26px; }
+  .site .step{ display:flex; align-items:center; gap:14px; min-height:64px; background:#fff; border:1px solid var(--lp-border); border-radius:14px; padding:12px 16px; }
+  .site .step .n{ flex-shrink:0; width:38px; height:38px; border-radius:10px; background:var(--dp-primary); color:#fff; font-family:var(--font-display); font-weight:700; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .site .step .st-t{ font-family:var(--font-display); font-weight:600; font-size:16px; color:var(--lp-heading); }
+  .site .step .st-d{ font-size:14px; color:var(--lp-body); margin-top:1px; }
+  .site .video{ position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:linear-gradient(150deg,#241845,#0E0620); cursor:pointer; border:1px solid var(--lp-border); -webkit-tap-highlight-color:transparent; }
+  .site .video .play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:64px; height:64px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .site .video .play::after{ content:""; margin-left:5px; border-left:20px solid #231702; border-top:12px solid transparent; border-bottom:12px solid transparent; }
+  .site .video .vlabel{ position:absolute; left:14px; bottom:12px; color:#fff; font-size:13px; font-family:var(--font-display); font-weight:600; z-index:2; }
+  .site .video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+  .site .pgrid{ display:grid; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; gap:12px; max-width:560px; margin:0 auto; }
+  .site .pcat{ background:#fff; border:1px solid var(--lp-border); border-radius:16px; padding:20px 12px; text-align:center; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease; -webkit-tap-highlight-color:transparent; }
+  .site .pcat:active{ transform:scale(.97); }
+  .site .pcat:hover{ box-shadow:0 14px 30px -16px rgba(20,10,32,.3); border-color:var(--gold); }
+  .site .pcat .emo{ font-size:34px; line-height:1; }
+  .site .pcat .pimg{ width:100%; max-width:140px; height:84px; object-fit:contain; filter:drop-shadow(0 10px 18px rgba(20,10,32,.18)); transition:transform .2s ease; }
+  .site .pcat:hover .pimg{ transform:scale(1.04); }
+  /* portrait stand photo: taller box so its subject reads at card size */
+  /* wide Stands tile spanning both columns (the "1" in the 2,2,1 layout) */
+  .site .pcat.pcat-wide{ grid-column:1 / -1; flex-direction:row; gap:20px; }
+  .site .pcat.pcat-wide .pimg{ height:auto; max-height:150px; width:auto; max-width:74%; }
+  .site .pcat .pn{ font-family:var(--font-display); font-weight:600; font-size:15px; color:var(--lp-heading); }
+  .site .shop-all{ text-align:center; margin-top:22px; }
+
+  /* swipe carousel — native horizontal scroll (smooth browser momentum) */
+  .site .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:4px 18px 14px; margin:0 -18px; scrollbar-width:none; }
+  .site .carousel::-webkit-scrollbar{ display:none; }
+  .site .tvid{ position:relative; flex:0 0 auto; width:clamp(180px,62vw,230px); scroll-snap-align:center; aspect-ratio:9/16; border-radius:18px; overflow:hidden; cursor:pointer; background:linear-gradient(160deg,#2a1a52,#0E0620); border:1px solid var(--lp-border); box-shadow:0 14px 30px -16px rgba(20,10,32,.45); -webkit-tap-highlight-color:transparent; }
+  .site .tvid .play{ position:absolute; top:44%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; }
+  .site .tvid .play::after{ content:""; margin-left:4px; border-left:16px solid #231702; border-top:10px solid transparent; border-bottom:10px solid transparent; }
+  .site .tvid .meta{ position:absolute; left:12px; right:12px; bottom:12px; color:#fff; z-index:2; text-shadow:0 1px 6px rgba(0,0,0,.6); }
+  .site .tvid .meta .stars{ color:var(--gold); font-size:12px; letter-spacing:1px; }
+  .site .tvid .meta .nm{ font-family:var(--font-display); font-weight:700; font-size:15px; margin-top:2px; }
+  .site .tvid .meta .ro{ font-size:12px; color:#e3d7f2; }
+  .site .tvid iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; z-index:3; }
+  .site .swipe-hint{ text-align:center; font-size:12px; color:var(--lp-body); margin-top:4px; }
+
+  .site .faq{ max-width:780px; margin:0 auto; }
+  .site .faq details{ background:#fff; border:1px solid var(--lp-border); border-radius:14px; margin-bottom:10px; overflow:hidden; }
+  .site .faq summary{ list-style:none; cursor:pointer; min-height:56px; padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px; font-family:var(--font-display); font-weight:600; font-size:16px; color:var(--lp-heading); -webkit-tap-highlight-color:transparent; }
+  .site .faq summary::-webkit-details-marker{ display:none; }
+  .site .faq .pl{ position:relative; width:20px; height:20px; flex-shrink:0; transition:transform .25s ease; }
+  .site .faq .pl::before{ content:""; position:absolute; left:4px; top:5px; width:9px; height:9px; border-right:2px solid var(--gold); border-bottom:2px solid var(--gold); transform:rotate(45deg); }
+  .site .faq details[open] .pl{ transform:rotate(180deg); }
+  .site .faq .ans{ padding:0 18px 18px; font-size:15px; color:var(--lp-body); }
+
+  .site .industries{ background:var(--lp-surface); }
+  .site .igrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .site .ind{ background:#fff; border:1px solid var(--lp-border); border-radius:14px; padding:16px 14px; display:flex; align-items:center; gap:12px; min-height:64px; transition:transform .12s ease, border-color .2s ease; }
+  .site .ind:active{ transform:scale(.98); }
+  .site .ind:hover{ border-color:var(--gold); }
+  .site .ind .emo{ font-size:26px; line-height:1; }
+  .site .ind .inm{ font-family:var(--font-display); font-weight:600; font-size:15px; color:var(--lp-heading); }
+
+  .site .cta{ text-align:center; }
+  .site .cta-box{ background:linear-gradient(160deg,#1c0c3f,#0E0620); border-radius:22px; padding:38px 22px; color:#fff; }
+  .site .cta-box h2{ color:#fff; font-size:26px; font-weight:700; margin-bottom:10px; }
+  .site .cta-box h2 .accent{ color:var(--gold); }
+  .site .cta-box p{ color:#cbb8e0; font-size:16px; margin-bottom:24px; }
+  .site .cta-actions{ display:flex; flex-direction:column; gap:12px; max-width:360px; margin:0 auto; }
+  .site .cta-foot{ margin-top:18px; font-size:13px; color:#9b8bb5; }
+
+  .site footer{ background:var(--dp-footer); color:#9b8bb5; padding:36px 0 26px; }
+  .site footer .logo{ display:flex; align-items:center; gap:10px; }
+  .site footer .logo .ic{ width:32px; height:32px; flex-shrink:0; border:1.5px solid var(--gold); border-radius:8px; display:inline-flex; align-items:center; justify-content:center; }
+  .site footer .logo .tx{ font-family:var(--font-display); font-weight:700; font-size:15px; color:#fff; }
+  .site footer .logo .tx b{ color:var(--gold); }
+  .site .ftag{ font-size:14px; margin:12px 0 18px; max-width:300px; }
+  .site .fcols{ display:grid; grid-template-columns:1fr 1fr; gap:22px; margin:24px 0; }
+  .site .fcols h4{ font-size:13px; letter-spacing:1px; text-transform:uppercase; color:#fff; margin-bottom:12px; }
+  .site .fcols a{ display:block; font-size:14px; margin-bottom:9px; min-height:24px; color:#9b8bb5; }
+  .site .fcols a:hover{ color:#fff; }
+  .site .fbar{ border-top:1px solid var(--dp-border); padding-top:18px; font-size:12.5px; }
+  .site .socials{ display:flex; gap:10px; margin-top:6px; }
+  .site .socials a{ width:44px; height:44px; border-radius:11px; border:1px solid var(--dp-border); display:flex; align-items:center; justify-content:center; color:#cbb8e0; }
+
+  @media (min-width:768px){
+    .site .section{ padding:64px 0; }
+    .site .sec-head h2{ font-size:34px; }
+    .site .stats-grid{ grid-template-columns:repeat(4,1fr); }
+    .site .stat .num{ font-size:34px; }
+    .site .steps{ flex-direction:row; }
+    .site .step{ flex:1; flex-direction:column; text-align:center; min-height:0; padding:20px 16px; gap:10px; }
+    .site .pgrid{ gap:16px; }
+    .site .pcat{ min-height:150px; }
+    .site .pcat .emo{ font-size:42px; }
+    .site .pcat .pimg{ height:100px; }
+    .site .igrid{ grid-template-columns:repeat(4,1fr); }
+    .site .tvid{ width:230px; }
+    .site .cta-actions{ flex-direction:row; justify-content:center; }
+    .site .fcols{ grid-template-columns:2fr 1fr 1fr 1fr; }
+  }
+  @media (min-width:1024px){
+    .site .pgrid{ max-width:600px; }
+    .site .pcat{ min-height:140px; }
+    .site .pcat .emo{ font-size:34px; }
+    .site .pcat .pimg{ height:74px; }
+    .site .tvid{ width:240px; }
+  }
+
+  /* ============================================================
+     SHARED CART — button + drawer (same eb_cart store as the shop)
+     ============================================================ */
+  .eb-cart-btn{ position:relative; background:transparent; border:1.5px solid var(--purple-line); color:var(--white); font-weight:600; font-size:14px; padding:9px 14px 9px 36px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; white-space:nowrap; }
+  .eb-cart-btn svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); }
+  .eb-cart-btn.icon-only{ padding:9px; width:40px; height:40px; justify-content:center; }
+  .eb-cart-btn.icon-only svg{ position:static; transform:none; }
+  .eb-cart-count{ position:absolute; top:-8px; right:-8px; min-width:20px; height:20px; padding:0 5px; background:var(--gold); color:#1a1206; font-size:11px; font-weight:800; border-radius:10px; display:none; align-items:center; justify-content:center; }
+  .eb-cart-count.show{ display:flex; }
+  .eb-overlay{ position:fixed; inset:0; background:rgba(3,1,10,0.6); backdrop-filter:blur(2px); opacity:0; visibility:hidden; transition:0.25s; z-index:400; }
+  .eb-overlay.open{ opacity:1; visibility:visible; }
+  .eb-drawer{ position:fixed; top:0; right:0; height:100%; width:400px; max-width:92vw; z-index:410; background:#0c0720; border-left:1px solid var(--purple-line); transform:translateX(100%); transition:transform 0.28s ease; display:flex; flex-direction:column; color:var(--white); font-family:'Helvetica Neue',Arial,sans-serif; }
+  .eb-drawer.open{ transform:translateX(0); }
+  .eb-drawer-head{ display:flex; align-items:center; justify-content:space-between; padding:22px 22px 16px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .eb-drawer-head h2{ font-size:19px; font-weight:800; }
+  .eb-close{ background:transparent; border:none; color:var(--grey); font-size:26px; cursor:pointer; line-height:1; }
+  .eb-items{ flex:1; overflow-y:auto; padding:16px 22px; }
+  .eb-empty{ color:var(--grey); text-align:center; padding:60px 0; font-size:15px; }
+  .eb-citem{ display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .eb-citem .eb-thumb{ width:56px; height:38px; border-radius:7px; flex-shrink:0; }
+  .eb-ci-name{ font-size:14.5px; font-weight:700; }
+  .eb-ci-price{ font-size:13px; color:var(--grey); margin-top:2px; }
+  .eb-qty{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .eb-qty button{ width:24px; height:24px; border-radius:6px; border:1px solid var(--purple-line); background:transparent; color:var(--white); font-size:15px; cursor:pointer; line-height:1; }
+  .eb-qty span{ font-size:14px; font-weight:700; min-width:18px; text-align:center; }
+  .eb-ci-remove{ margin-left:auto; background:transparent; border:none; color:var(--grey-dim); font-size:12px; cursor:pointer; text-decoration:underline; align-self:flex-start; }
+  .eb-ci-line{ font-weight:800; }
+  .eb-foot{ padding:18px 22px 24px; border-top:1px solid rgba(255,255,255,0.08); }
+  .eb-subtotal{ display:flex; justify-content:space-between; font-size:17px; font-weight:800; margin-bottom:4px; }
+  .eb-ship{ color:#4ade9b; font-size:12.5px; margin-bottom:16px; }
+  .eb-checkout{ width:100%; padding:15px 0; border-radius:11px; font-size:16px; font-weight:800; cursor:pointer; border:none; background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#1a1206; box-shadow:0 14px 30px -10px rgba(240,180,41,0.4); }
+  .eb-checkout:disabled{ opacity:0.5; cursor:not-allowed; }
+  .eb-paynote{ text-align:center; color:var(--grey-dim); font-size:11.5px; margin-top:12px; }
+  @media (max-width:480px){ .eb-drawer{ width:100%; } }
+</style>
+</head>
+<body>
+
+<!-- ===================== ORIGINAL HERO — MOBILE ===================== -->
+<div class="mobile-view">
+<div class="page">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/exposureboostlogo/rocketlogo.svg" alt="ExposureBoost" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+      </div>
+      <div class="logo-text">EXPOSURE<span class="boost">BOOST</span></div>
+    </div>
+    <div class="header-right">
+      <button class="eb-cart-btn icon-only eb-cart-open" aria-label="Open cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h11L21 7H6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="#fff"/><circle cx="18" cy="20" r="1.4" fill="#fff"/></svg>
+        <span class="eb-cart-count">0</span>
+      </button>
+      <div class="menu-icon" id="menuIcon" role="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile menu">
+    <a href="/metal">Metal</a>
+    <a href="/wood">Wood</a>
+    <a href="/plastic">Plastic</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">FAQ</a>
+    <a href="mailto:ediz@exposureboost.com">Contact</a>
+    <a href="https://app.exposureboost.co.uk" target="_blank" rel="noopener">Sign in</a>
+  </nav>
+
+  <section class="hero">
+    <div class="text-block">
+      <div class="eyebrow">Trusted by BNI members across the UK</div>
+      <h1>The business card people <span class="accent">don't forget.</span></h1>
+      <p class="subhead">One Tap, All Your Details, Shared Instantly</p>
+    </div>
+
+    <div class="visual">
+      <div class="phone" id="phoneEl">
+        <div class="ripple" id="rippleEl"></div>
+
+        <div class="nfc-wrap">
+          <svg class="nfc-icon" viewBox="0 0 64 48" fill="none">
+            <path d="M16 22C24 13 40 13 48 22" stroke="#c9a8ef" stroke-width="3" stroke-linecap="round"/>
+            <path d="M21 28C26.5 22 37.5 22 43 28" stroke="#c9a8ef" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+            <path d="M26 34C29.5 30.5 34.5 30.5 38 34" stroke="#c9a8ef" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+          </svg>
+          <div class="ready-text">Ready to tap</div>
+        </div>
+
+        <div class="demo-stage" id="stage1" data-stage-panel="1">
+          <div class="rev-header">
+            <div class="rev-header-text">
+              <div class="rev-name">J. Matthews</div>
+              <div class="rev-role">Managing Director</div>
+            </div>
+            <div class="rev-rating">&#9733; 4.8</div>
+          </div>
+          <div class="rev-row">
+            <div class="rev-icon gold">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 4h3l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v3a2 2 0 01-2 2C10.5 20 4 13.5 4 6a2 2 0 012-2z" stroke="#1a1206" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <div><div class="rev-label">Phone</div><div class="rev-value"></div></div>
+          </div>
+          <div class="rev-row">
+            <div class="rev-icon purple">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M4 7l8 6 8-6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <div><div class="rev-label">Email</div><div class="rev-value"></div></div>
+          </div>
+          <button class="rev-action" id="saveBtn">Save contact</button>
+        </div>
+
+        <div class="demo-stage save-confirm" id="stage2" data-stage-panel="2">
+          <div class="save-check">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4.5 4.5L19 7.5" stroke="#4ee08a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="save-confirm-title">Saved to contacts</div>
+          <div class="save-confirm-sub">J. Matthews is ready to call</div>
+          <button class="rev-action" id="reviewBtn">Leave a review</button>
+        </div>
+
+        <div class="demo-stage review-stage" id="stage3" data-stage-panel="3">
+          <div class="review-title">Rate your experience</div>
+          <div class="review-stars" id="reviewStars">
+            <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+          </div>
+          <div class="review-thanks" id="reviewThanks">Thanks for the 5 stars!</div>
+        </div>
+
+        <div class="demo-stage customise-stage" id="stage4" data-stage-panel="4">
+          <div class="customise-title">Customise yours fully</div>
+          <div class="customise-sub">Colours, links, socials &amp; more</div>
+          <div class="customise-row">
+            <div class="swatch" style="background:var(--gold)"></div>
+            <div class="rev-label">Card colour</div>
+          </div>
+          <div class="customise-row">
+            <div class="swatch" style="background:var(--purple)"></div>
+            <div class="rev-label">Accent colour</div>
+          </div>
+        </div>
+
+        <div class="customise-cursor" id="customCursor"></div>
+
+        <div class="biz-card" id="cardEl">
+          <div class="chip"></div>
+          <div class="card-bottom-row">
+            <div>
+              <div class="card-name">J. Matthews</div>
+              <div class="card-role">Managing Director</div>
+            </div>
+            <svg class="card-nfc" viewBox="0 0 26 20" fill="none">
+              <path d="M5 7.5C8.5 3.5 17.5 3.5 21 7.5" stroke="#241704" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7.5 11C10.3 8 15.7 8 18.5 11" stroke="#241704" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-group">
+      <div class="cta-row">
+        <button class="btn btn-primary">Get your card</button>
+        <button class="btn btn-secondary">How it works</button>
+      </div>
+      <p class="footnote">Free UK delivery <span class="dot">&bull;</span> Profile updates always free</p>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<!-- ===================== ORIGINAL HERO — DESKTOP ===================== -->
+<div class="desktop-view">
+<div class="hero">
+    <nav>
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="/exposureboostlogo/rocketlogo.svg" alt="ExposureBoost" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+        </div>
+        <div class="logo-text">EXPOSURE<span class="boost">BOOST</span></div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="/metal">Metal</a></li>
+        <li><a href="/wood">Wood</a></li>
+        <li><a href="/plastic">Plastic</a></li>
+        <li><a href="/stands">Stands</a></li>
+        <li><a href="/keyrings">Keyrings</a></li>
+      </ul>
+
+      <div class="nav-right">
+        <a class="nav-signin" href="https://app.exposureboost.co.uk" target="_blank" rel="noopener">Sign in</a>
+        <button class="eb-cart-btn icon-only eb-cart-open" aria-label="Open cart">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h11L21 7H6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="#fff"/><circle cx="18" cy="20" r="1.4" fill="#fff"/></svg>
+          <span class="eb-cart-count">0</span>
+        </button>
+        <button class="nav-cta">Buy now</button>
+      </div>
+    </nav>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow">NFC Business Cards</div>
+        <h1>Your details, <br>in <span class="accent">one tap.</span></h1>
+        <p class="subhead">The NFC business card for independent professionals. Update your profile in real time — no app to download, nothing to print again.</p>
+
+        <div class="hero-ctas">
+          <button class="btn-primary">Get your card <span>&rarr;</span></button>
+          <button class="btn-secondary">How it works</button>
+        </div>
+
+        <div class="trust-row">
+          <span>Trusted by BNI members across the UK</span>
+          <div class="trust-dot"></div>
+          <span>Free UK delivery</span>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="phone-screen">
+            <div class="screen-top-row">
+              <div class="mini-logo"></div>
+              <div class="lang-pill">EN</div>
+            </div>
+
+            <div class="profile-bar">
+              <div>
+                <div class="name">J. Matthews</div>
+                <div class="role">Managing Director</div>
+              </div>
+              <div class="rating-pill">&#9733; 4.8</div>
+            </div>
+
+            <div class="tab-row">
+              <div class="tab active">Contact</div>
+              <div class="tab">Socials</div>
+              <div class="tab">Links</div>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-icon icon-call">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 4h3l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v3a2 2 0 01-2 2C10.5 20 4 13.5 4 6a2 2 0 012-2z" stroke="#1a1206" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="contact-detail">
+                <div class="label">Phone</div>
+                <div class="value"></div>
+              </div>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-icon icon-mail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7l8 6 8-6" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="contact-detail">
+                <div class="label">Email</div>
+                <div class="value"></div>
+              </div>
+            </div>
+
+            <div class="badge-saved">Saved instantly</div>
+          </div>
+        </div>
+
+        <div class="floating-card">
+          <div class="fc-icon"></div>
+          <div class="fc-text">EXPOSUREBOOST</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LIGHT SECTIONS BELOW HERO ===================== -->
+<div class="site">
+
+  <!-- 1. STATS -->
+  <section class="stats section">
+    <div class="wrap">
+      <div class="stats-grid">
+        <div class="stat"><div class="num">10k<b>+</b></div><div class="lbl">Cards shipped</div></div>
+        <div class="stat"><div class="num">4.9<b>★</b></div><div class="lbl">Average rating</div></div>
+        <div class="stat"><div class="num">2<b> min</b></div><div class="lbl">Setup time</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">Apps to install</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. HOW IT WORKS -->
+  <section class="how section" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Up and running in <span class="accent">3 taps</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><div class="st-t">Customise</div><div class="st-d">Add your details &amp; design</div></div></div>
+        <div class="step"><div class="n">2</div><div><div class="st-t">Receive</div><div class="st-d">We print &amp; ship it free</div></div></div>
+        <div class="step"><div class="n">3</div><div><div class="st-t">Tap &amp; share</div><div class="st-d">Tap any phone to connect</div></div></div>
+      </div>
+      <!-- Tap-to-play video. Replace data-yt with your real YouTube ID. -->
+      <div class="video">
+        <div class="play"></div>
+        <div class="vlabel">▶ Watch the 45s demo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PRODUCT GRID -->
+  <section class="products section" id="products">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Our range</span>
+        <h2>Pick your <span class="accent">style</span></h2>
+      </div>
+      <div class="pgrid">
+        <a class="pcat" href="/metal"><img class="pimg" src="/metalimages/newgold.webp" alt="Gold metal NFC card" loading="lazy"><span class="pn">Metal</span></a>
+        <a class="pcat" href="/wood"><img class="pimg" src="/woodimages/newbamboo%20(1)%20(1).webp" alt="Bamboo wooden NFC card" loading="lazy"><span class="pn">Wood</span></a>
+        <a class="pcat" href="/plastic"><img class="pimg" src="/plasticimages/newplasticpink.webp" alt="Pink plastic NFC card" loading="lazy"><span class="pn">Plastic</span></a>
+        <a class="pcat" href="/keyrings"><img class="pimg" src="/keyringimages/keyrings.webp" alt="NFC keyrings" loading="lazy"><span class="pn">Keyrings</span></a>
+        <a class="pcat pcat-wide" href="/stands"><img class="pimg" src="/standimages/3stands.webp" alt="NFC stands" loading="lazy"><span class="pn">Stands</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. VIDEO TESTIMONIALS (portrait) -->
+  <section class="testimonials section">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Real stories</span>
+        <h2>Loved by <span class="accent">professionals</span></h2>
+      </div>
+    </div>
+    <div class="wrap">
+      <!-- Circular swipe carousel. Swipe as normal; JS clones a set on each side so
+           it wraps seamlessly from the end back to the start (and vice-versa).
+           Replace each data-yt with a real (vertical) video ID. -->
+      <div class="carousel" id="tCarousel">
+        <div class="tvid" data-yt="QieANfkOWHI"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Simon Trick</div><div class="ro">Sports massages</div></div></div>
+        <div class="tvid"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Sarah P.</div><div class="ro">Estate Agent</div></div></div>
+        <div class="tvid"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Daniel O.</div><div class="ro">Recruiter</div></div></div>
+        <div class="tvid"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Amelia R.</div><div class="ro">Consultant</div></div></div>
+        <div class="tvid"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Michael B.</div><div class="ro">Financial Adviser</div></div></div>
+        <div class="tvid"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Grace L.</div><div class="ro">Marketing Lead</div></div></div>
+      </div>
+    </div>
+    <div class="wrap"><div class="swipe-hint">← swipe to see more →</div></div>
+  </section>
+
+  <!-- 5. FAQ -->
+  <section class="faqs section" id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions, <span class="accent">answered</span></h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Do I need a phone with NFC?<span class="pl"></span></summary>
+          <div class="ans">Almost every phone from the last few years has NFC. For older phones, your card also has a QR code so anyone can scan it.</div>
+        </details>
+        <details>
+          <summary>Can I change my details later?<span class="pl"></span></summary>
+          <div class="ans">Yes — update anything from your dashboard and every card you've shared updates instantly. Profile updates are free forever.</div>
+        </details>
+        <details>
+          <summary>Is my data secure?<span class="pl"></span></summary>
+          <div class="ans">You control exactly what's shown and can change it anytime. We never sell your data.</div>
+        </details>
+        <details>
+          <summary>What if I lose my card?<span class="pl"></span></summary>
+          <div class="ans">Deactivate it from your dashboard and order a replacement linked to the same profile — your details stay the same.</div>
+        </details>
+        <details>
+          <summary>Do you ship internationally?<span class="pl"></span></summary>
+          <div class="ans">UK delivery is free. We ship worldwide — international rates are shown at checkout.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. INDUSTRY CATALOGUE -->
+  <section class="industries section">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Who it's for</span>
+        <h2>Built for <span class="accent">every industry</span></h2>
+      </div>
+      <div class="igrid">
+        <div class="ind"><span class="emo">🚗</span><span class="inm">Automotive</span></div>
+        <div class="ind"><span class="emo">🏗️</span><span class="inm">Construction</span></div>
+        <div class="ind"><span class="emo">🛍️</span><span class="inm">Retail</span></div>
+        <div class="ind"><span class="emo">🏠</span><span class="inm">Real Estate</span></div>
+        <div class="ind"><span class="emo">🍽️</span><span class="inm">Hospitality</span></div>
+        <div class="ind"><span class="emo">🩺</span><span class="inm">Healthcare</span></div>
+        <div class="ind"><span class="emo">💅</span><span class="inm">Beauty</span></div>
+        <div class="ind"><span class="emo">🏋️</span><span class="inm">Fitness</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CTA -->
+  <section class="cta section">
+    <div class="wrap">
+      <div class="cta-box">
+        <h2>Ready to never run out <span class="accent">of cards?</span></h2>
+        <p>Join the professionals making every introduction count with one tap.</p>
+        <div class="cta-actions">
+          <a class="btn btn-gold btn-block" href="#products">Get your card today</a>
+          <a class="btn btn-wa btn-block" href="https://wa.me/447754888841" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#04361b"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-2.8.8.8-2.8-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.5 6.5 0 01-1.9-1.2 7.3 7.3 0 01-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4c0-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a.9.9 0 00-.7.3 2.8 2.8 0 00-.9 2.1 4.9 4.9 0 001 2.6 11 11 0 004.3 3.8c.6.3 1.1.4 1.5.6a3.5 3.5 0 001.6.1 2.7 2.7 0 001.8-1.3 2.2 2.2 0 00.2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+        <div class="cta-foot">Free UK delivery • 30-day guarantee • No hidden fees</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <a class="logo" href="/">
+        <span class="ic">
+          <img src="/exposureboostlogo/rocketlogo.svg" alt="ExposureBoost" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+        </span>
+        <span class="tx">EXPOSURE<b>BOOST</b></span>
+      </a>
+      <p class="ftag">The NFC business card for professionals. Tap, share, and never run out again.</p>
+      <div class="fcols">
+        <div>
+          <h4>Shop</h4>
+          <a href="#products">All products</a>
+          <a href="/metal">Metal card</a>
+          <a href="/wood">Wooden card</a>
+          <a href="/plastic">Plastic card</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+          <a href="mailto:ediz@exposureboost.com">Contact</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="#">Terms</a>
+          <a href="#">Refunds</a>
+        </div>
+        <div>
+          <h4>Follow</h4>
+          <div class="socials">
+            <a href="https://instagram.com/exposureboost" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="7" r="1.2" fill="currentColor"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="fbar">© 2026 ExposureBoost. All rights reserved. · Free UK delivery</div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- SHARED CART DRAWER -->
+<div class="eb-overlay" id="ebOverlay"></div>
+<aside class="eb-drawer" id="ebDrawer" aria-label="Shopping cart">
+  <div class="eb-drawer-head">
+    <h2>Your cart</h2>
+    <button class="eb-close" id="ebClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="eb-items" id="ebItems"></div>
+  <div class="eb-foot">
+    <div class="eb-subtotal"><span>Subtotal</span><span id="ebSubtotal">£0</span></div>
+    <div class="eb-ship">✓ Free UK delivery included</div>
+    <button class="eb-checkout" id="ebCheckout" disabled>Checkout securely</button>
+    <p class="eb-paynote">🔒 Payments secured by Stripe</p>
+  </div>
+</aside>
+
+<script>
+/* ---- original hero animation (unchanged) ---- */
+(function(){
+  var phone = document.getElementById('phoneEl');
+  var card = document.getElementById('cardEl');
+  var ripple = document.getElementById('rippleEl');
+  var stages = [1,2,3,4].map(function(n){ return document.getElementById('stage' + n); });
+  var stars = document.querySelectorAll('#reviewStars span');
+  var thanks = document.getElementById('reviewThanks');
+  var cursor = document.getElementById('customCursor');
+  if (!phone || !card || !ripple || stages.indexOf(null) !== -1) return;
+
+  var timers = [];
+  function after(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function clearAll(){ timers.forEach(clearTimeout); timers = []; }
+
+  function showStage(n){
+    stages.forEach(function(el, i){ el.classList.toggle('is-visible', i === (n - 1)); });
+    phone.setAttribute('data-stage', String(n));
+  }
+  function hideAllStages(){
+    stages.forEach(function(el){ el.classList.remove('is-visible'); });
+    phone.removeAttribute('data-stage');
+  }
+  function fireRipple(){ ripple.classList.remove('is-rippling'); void ripple.offsetWidth; ripple.classList.add('is-rippling'); }
+  function resetStars(){ stars.forEach(function(s){ s.classList.remove('lit'); }); thanks.classList.remove('is-shown'); }
+  function litStars(count){ stars.forEach(function(s, i){ if (i < count) s.classList.add('lit'); }); }
+  function resetCursor(){ cursor.classList.remove('is-active'); }
+
+  function playSequence(){
+    clearAll(); resetStars(); resetCursor(); hideAllStages();
+    card.classList.remove('is-tapped'); phone.classList.remove('is-active');
+
+    after(400, function(){
+      card.classList.add('is-tapped'); phone.classList.add('is-active');
+      fireRipple(); showStage(1);
+    });
+    after(3000, function(){ showStage(2); });
+    after(6000, function(){
+      showStage(3);
+      [120, 320, 520, 720, 920].forEach(function(delay, i){
+        timers.push(setTimeout(function(){ litStars(i + 1); }, delay));
+      });
+      timers.push(setTimeout(function(){ thanks.classList.add('is-shown'); }, 1150));
+    });
+    after(9000, function(){
+      showStage(4);
+      timers.push(setTimeout(function(){ cursor.classList.add('is-active'); }, 350));
+    });
+    after(11600, function(){
+      card.classList.remove('is-tapped'); phone.classList.remove('is-active');
+      hideAllStages(); resetCursor();
+    });
+    after(12000, playSequence);
+  }
+  after(500, playSequence);
+})();
+
+/* ---- hero CTAs -> "Pick your style" section / how-it-works ---- */
+(function(){
+  function scrollToId(sel, id){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        var t = document.getElementById(id);
+        if (t) t.scrollIntoView({ behavior:'smooth' });
+      });
+    });
+  }
+  // "Get your card" / "Order now" / "Buy now" -> choose-your-style
+  scrollToId('.mobile-view .btn-primary, .desktop-view .nav-cta, .desktop-view .btn-primary', 'products');
+  // secondary "How it works" -> how-it-works section
+  scrollToId('.mobile-view .btn-secondary, .desktop-view .btn-secondary', 'how');
+})();
+
+/* ---- mobile dropdown menu ---- */
+(function(){
+  var btn = document.getElementById('menuIcon');
+  var menu = document.getElementById('mobileMenu');
+  if(!btn || !menu) return;
+  function setOpen(open){
+    menu.classList.toggle('open', open);
+    btn.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  btn.addEventListener('click', function(){ setOpen(!menu.classList.contains('open')); });
+  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setOpen(false); }); });
+})();
+
+/* ---- testimonials: native horizontal-scroll carousel (free swipe, smooth
+        browser momentum, no JS). Scroll/swipe through to the last card and
+        back; it does not auto-loop. ---- */
+
+/* ---- tap-to-play videos (how-it-works + testimonials) ---- */
+(function(){
+  document.querySelectorAll('[data-yt]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var id = el.getAttribute('data-yt');
+      if(!id || el.querySelector('iframe')) return;
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+      f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      f.setAttribute('allowfullscreen', '');
+      el.innerHTML = '';
+      el.appendChild(f);
+    });
+  });
+})();
+
+/* ---- shared cart (persisted in localStorage as "eb_cart", shared with
+        the product pages, the shop and checkout) ---- */
+(function(){
+  var ORDER_FORM_URL = "https://exposureboost-checkout.exposureboost.workers.dev";
+  // Prices enforced in the Worker — keep in sync with worker/worker.js.
+  var CATALOG = {
+    metal:   { name:"Metal NFC Card",   price:99, thumb:"linear-gradient(150deg,#e8eaed,#9498a0)" },
+    wooden:  { name:"Wooden NFC Card",  price:70, thumb:"linear-gradient(150deg,#9c6a37,#5e3c1d)" },
+    plastic: { name:"Plastic NFC Card", price:70, thumb:"linear-gradient(155deg,#f7c948,#e0991a)" },
+    stand:   { name:"NFC Stand", price: 99, thumb:"linear-gradient(160deg,#241845,#3a2a66)" },
+    keyring: { name:"NFC Keyring (3-pack)", price: 60, thumb:"linear-gradient(160deg,#3a2a66,#241845)" }
+  };
+  var KEY = "eb_cart";
+  var cart = [];
+  try { cart = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch(e){}
+  var $ = function(id){ return document.getElementById(id); };
+  function save(){ localStorage.setItem(KEY, JSON.stringify(cart)); }
+
+  function setQty(idx, delta){
+    var line = cart[idx];
+    if(!line) return;
+    line.qty += delta;
+    if(line.qty <= 0) cart.splice(idx, 1);
+    save(); render();
+  }
+  function remove(idx){ cart.splice(idx, 1); save(); render(); }
+
+  function render(){
+    var count = cart.reduce(function(n,i){ return n + i.qty; }, 0);
+    document.querySelectorAll('.eb-cart-count').forEach(function(el){
+      el.textContent = count;
+      el.classList.toggle('show', count > 0);
+    });
+    var wrap = $('ebItems');
+    if(wrap){
+      if(!cart.length){
+        wrap.innerHTML = '<div class="eb-empty">Your cart is empty.<br>Add a card to get started.</div>';
+      } else {
+        wrap.innerHTML = cart.map(function(i, idx){
+          var p = CATALOG[i.id]; if(!p) return '';
+          var label = i.finish ? (p.name + ' — ' + i.finish) : p.name;
+          return '<div class="eb-citem">'
+            + '<div class="eb-thumb" style="background:'+(i.img?'#fff':p.thumb)+'">'+(i.img?'<img src="'+i.img+'" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:7px;">':'')+'</div>'
+            + '<div style="flex:1">'
+            + '<div class="eb-ci-name">'+label+'</div>'
+            + '<div class="eb-ci-price">£'+p.price+' each</div>'
+            + '<div class="eb-qty">'
+            + '<button data-dec="'+idx+'">−</button>'
+            + '<span>'+i.qty+'</span>'
+            + '<button data-inc="'+idx+'">+</button>'
+            + '<button class="eb-ci-remove" data-rem="'+idx+'">Remove</button>'
+            + '</div></div>'
+            + '<div class="eb-ci-line">£'+(p.price*i.qty)+'</div>'
+            + '</div>';
+        }).join('');
+      }
+    }
+    var total = cart.reduce(function(s,i){ return s + (CATALOG[i.id] ? CATALOG[i.id].price * i.qty : 0); }, 0);
+    if($('ebSubtotal')) $('ebSubtotal').textContent = '£' + total;
+    if($('ebCheckout')) $('ebCheckout').disabled = cart.length === 0;
+  }
+
+  function openDrawer(){ $('ebDrawer').classList.add('open'); $('ebOverlay').classList.add('open'); }
+  function closeDrawer(){ $('ebDrawer').classList.remove('open'); $('ebOverlay').classList.remove('open'); }
+
+  document.querySelectorAll('.eb-cart-open').forEach(function(btn){ btn.addEventListener('click', openDrawer); });
+  if($('ebClose')) $('ebClose').addEventListener('click', closeDrawer);
+  if($('ebOverlay')) $('ebOverlay').addEventListener('click', closeDrawer);
+  if($('ebItems')) $('ebItems').addEventListener('click', function(e){
+    var t = e.target;
+    if(t.dataset.inc) setQty(+t.dataset.inc, 1);
+    if(t.dataset.dec) setQty(+t.dataset.dec, -1);
+    if(t.dataset.rem) remove(+t.dataset.rem);
+  });
+  if($('ebCheckout')) $('ebCheckout').addEventListener('click', function(){
+    if(!cart.length) return;
+    var btn = $('ebCheckout'); btn.disabled = true; btn.textContent = 'Redirecting…';
+    var cartStr = cart.map(function(i){ return i.id + ':' + (i.finish || '') + ':' + i.qty; }).join(',');
+    window.location.href = ORDER_FORM_URL + '/?cart=' + encodeURIComponent(cartStr);
+  });
+  // reflect changes made on other pages / tabs
+  window.addEventListener('storage', function(e){
+    if(e.key === KEY){ try { cart = JSON.parse(e.newValue || '[]'); } catch(_){} render(); }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

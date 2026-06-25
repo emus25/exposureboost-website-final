@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wooden NFC Business Cards | ExposureBoost</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --dbg: #1C140C;
+  --dsf: #2A2014;
+  --dpr: #8A5A2B;
+  --dlt: #DDBE92;
+  --dbr: rgba(221, 190, 146, 0.16);
+  --lbg: #F5EEE3;
+  --lsf: #EBE1D2;
+  --lbr: rgba(40, 26, 12, 0.10);
+  --lhd: #2A1C0E;
+  --lbd: #6B5A45;
+  --gold: #B07B3E;
+  --green: #25D366;
+  --fd: 'Space Grotesk', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: system-ui, -apple-system, sans-serif; font-size: 16px; line-height: 1.7; background: var(--dbg); color: #fff; }
+.fd { font-family: var(--fd); }
+.mw { max-width: 1020px; margin: 0 auto; }
+
+/* ── BUTTONS ── */
+.gbtn {
+  background: var(--gold); color: var(--dbg);
+  font-family: var(--fd); font-size: 15px; font-weight: 700;
+  padding: 14px 28px; border-radius: 8px;
+  display: inline-block; text-decoration: none; cursor: pointer; border: none;
+  transition: opacity 0.15s;
+}
+.gbtn:hover { opacity: 0.88; }
+.gbtn-full { display: block; text-align: center; width: 100%; }
+.gbtn-lg { font-size: 17px; padding: 16px 32px; }
+.wa-btn { background: var(--green); color: #fff; font-size: 13px; font-weight: 500; padding: 8px 14px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.ghost-lt { background: transparent; color: var(--lhd); font-size: 14px; font-weight: 500; padding: 13px 20px; border-radius: 7px; border: 1.5px solid rgba(14,6,32,0.18); display: block; text-align: center; text-decoration: none; }
+
+/* ── NAV (index layout; colours adapt to each page so it blends in) ── */
+.site-nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 15px 48px; background: var(--dbg); border-bottom: 1px solid var(--dbr); }
+.nav-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-icon { width: 32px; height: 32px; border: 1.5px solid var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-logo-text { font-family: var(--fd); font-size: 17px; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
+.nav-logo-text b { color: var(--gold); }
+.nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; margin: 0; padding: 0; }
+.nav-menu a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s ease; }
+.nav-menu a:hover, .nav-menu a.active { color: #fff; }
+.nav-actions { display: flex; align-items: center; gap: 16px; }
+.nav-signin2 { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14px; font-weight: 600; white-space: nowrap; transition: color 0.2s ease; }
+.nav-signin2:hover { color: #fff; }
+.nav-cart { position: relative; background: transparent; border: 1px solid var(--dbr); color: #fff; padding: 9px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.nav-cart:hover { border-color: rgba(255,255,255,0.4); }
+.nav-cart svg { display: block; }
+.nav-cart .cart-count { background: var(--gold); }
+.nav-buy { background: var(--gold); color: var(--dbg); border: none; font-family: var(--fd); font-weight: 700; font-size: 14.5px; padding: 11px 22px; border-radius: 9px; cursor: pointer; white-space: nowrap; }
+.nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.nav-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+.nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-drop { position: absolute; top: 100%; left: 0; right: 0; background: var(--dsf); border-bottom: 1px solid var(--dbr); display: flex; flex-direction: column; padding: 6px 20px 16px; transform: translateY(-12px); opacity: 0; visibility: hidden; transition: transform 0.22s ease, opacity 0.18s ease, visibility 0.22s; box-shadow: 0 24px 40px -20px rgba(0,0,0,0.7); }
+.nav-drop.open { transform: translateY(0); opacity: 1; visibility: visible; }
+.nav-drop a { color: #fff; text-decoration: none; font-size: 15px; font-weight: 600; padding: 13px 4px; border-bottom: 1px solid var(--dbr); }
+.nav-drop a:last-child { border-bottom: none; }
+@media (max-width: 900px) {
+  .site-nav { padding: 14px 20px; }
+  .nav-menu, .nav-signin2, .nav-buy { display: none; }
+  .nav-burger { display: flex; }
+}
+
+/* ── STICKY BUY BAR ── */
+.sticky-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: var(--dbg); border-bottom: 0.5px solid var(--dbr);
+  padding: 10px 48px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  transform: translateY(-100%); transition: transform 0.25s ease;
+}
+.sticky-bar.visible { transform: translateY(0); }
+.sticky-bar-left { display: flex; align-items: center; gap: 14px; }
+.sticky-bar-left img { width: 48px; height: 30px; object-fit: contain; }
+.sticky-bar-price { font-family: var(--fd); font-size: 20px; font-weight: 700; color: var(--gold); }
+
+/* ── BREADCRUMB ── */
+.breadcrumb { font-size: 13px; color: rgba(255,255,255,0.38); margin-bottom: 12px; }
+.breadcrumb a { color: rgba(255,255,255,0.38); text-decoration: none; }
+.breadcrumb a:hover { color: rgba(255,255,255,0.6); }
+
+/* ── PRODUCT HERO GRID ── */
+.product-hero { background: var(--dbg); padding: 26px 48px 36px; }
+.ph-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: start; }
+
+/* LEFT - Image viewer */
+.ph-viewer { position: sticky; top: 74px; }
+.ph-main { background: var(--lbg); border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; max-height: 300px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+.ph-main img { width: 100%; height: 100%; object-fit: contain; padding: 18px; transition: opacity 0.2s; }
+
+/* colour selector label (driven by thumbnails) */
+.ph-colour-sel { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); margin: 0 0 8px; }
+.ph-colour-sel span { color: #fff; }
+
+/* compact buy row under images */
+.ph-buy { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 12px; }
+.ph-buy-price { font-family: var(--fd); font-size: 26px; font-weight: 700; color: var(--gold); line-height: 1.05; white-space: nowrap; }
+.ph-buy-price small { display: block; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.42); }
+.ph-add { background: var(--gold); color: var(--dbg); font-family: var(--fd); font-size: 14px; font-weight: 700; padding: 11px 24px; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+.ph-add:hover { opacity: 0.88; }
+.ph-add.added { background: rgba(37,211,102,0.16); color: var(--green); }
+.ph-vb { display: none; margin-top: 9px; font-size: 13px; color: var(--gold); text-decoration: none; align-items: center; gap: 6px; }
+.ph-vb:hover { text-decoration: underline; }
+.ph-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ph-thumb {
+  background: var(--lbg); border-radius: 8px; overflow: hidden;
+  aspect-ratio: 4/3; cursor: pointer;
+  border: 2px solid transparent; transition: border-color 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.ph-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.ph-thumb:hover { border-color: rgba(212,168,67,0.5); }
+.ph-thumb.active { border-color: var(--gold); }
+.ph-thumb-label { font-size: 10px; color: var(--lbd); text-align: center; margin-top: 3px; }
+
+/* RIGHT - Product info */
+.ph-info { padding-top: 4px; }
+.product-tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 12px; background: rgba(212,168,67,0.15); color: var(--gold); margin-bottom: 10px; letter-spacing: .04em; }
+.ph-h1 { font-family: var(--fd); font-size: 28px; font-weight: 700; line-height: 1.15; margin-bottom: 8px; }
+.ph-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; color: rgba(255,255,255,0.55); }
+.ph-stars { color: var(--gold); letter-spacing: 1px; }
+.ph-tagline { font-size: 15px; color: rgba(255,255,255,0.62); line-height: 1.5; margin-bottom: 18px; }
+
+/* Finish selector */
+.finish-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+.finish-label span { color: #fff; }
+.finish-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.finish-chip {
+  background: var(--dsf); border: 1.5px solid var(--dbr);
+  border-radius: 6px; padding: 6px 12px;
+  font-size: 13px; color: rgba(255,255,255,0.65);
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+}
+.finish-chip:hover { border-color: rgba(212,168,67,0.4); color: #fff; }
+.finish-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
+.finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Divider */
+.ph-divider { border: none; border-top: 0.5px solid var(--dbr); margin: 22px 0; }
+
+/* Price */
+.ph-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.ph-price { font-family: var(--fd); font-size: 40px; font-weight: 700; color: var(--gold); }
+.ph-price-note { font-size: 14px; color: rgba(255,255,255,0.42); }
+
+/* Includes */
+.ph-includes { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+.ph-includes li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.78); }
+.ph-includes i { color: var(--gold); font-size: 16px; flex-shrink: 0; }
+
+/* Specs accordion (inside the dark hero buy box) */
+.spec-acc { border-top: 0.5px solid var(--dbr); border-bottom: 0.5px solid var(--dbr); margin-bottom: 16px; }
+.spec-acc-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: none; border: none; cursor: pointer; padding: 14px 0; font-family: var(--fd); font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.55); -webkit-tap-highlight-color: transparent; }
+.spec-acc-toggle:hover { color: #fff; }
+.spec-acc-chev { font-size: 18px; color: rgba(255,255,255,0.45); transition: transform 0.25s ease; }
+.spec-acc-toggle[aria-expanded="true"] .spec-acc-chev { transform: rotate(180deg); }
+.spec-acc-panel { padding: 0 0 14px; }
+.spec-acc-panel[hidden] { display: none; }
+.spec-acc-panel .specs-table { width: 100%; border-collapse: collapse; }
+.spec-acc-panel .specs-table td { padding: 8px 0; font-size: 13px; vertical-align: top; border-bottom: 0.5px solid var(--dbr); color: rgba(255,255,255,0.72); }
+.spec-acc-panel .specs-table tr:last-child td { border-bottom: none; }
+.spec-acc-panel .specs-table td:first-child { color: rgba(255,255,255,0.45); width: 38%; padding-right: 14px; white-space: nowrap; }
+.spec-acc-panel .specs-table td:last-child { color: rgba(255,255,255,0.82); font-weight: 400; }
+.spec-acc-panel .specs-table tr { border-bottom: none; }
+
+/* CTA area */
+.ph-cta-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.ph-wa-link { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.5); text-decoration: none; padding: 8px; }
+.ph-wa-link:hover { color: var(--green); }
+
+/* Trust badges */
+.ph-trust { display: flex; flex-wrap: wrap; gap: 16px; }
+.ph-badge { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,0.45); }
+.ph-badge i { font-size: 15px; color: rgba(255,255,255,0.35); }
+
+/* ── REACTION SECTION ── */
+.reaction-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+.reaction-item { text-align: center; padding: 32px 24px; }
+.reaction-icon { font-size: 32px; color: var(--dpr); margin-bottom: 14px; }
+.reaction-title { font-family: var(--fd); font-size: 18px; font-weight: 500; color: var(--lhd); margin-bottom: 8px; }
+.reaction-text { font-size: 14px; color: var(--lbd); line-height: 1.6; }
+
+/* ── ORDER PROCESS ── */
+.steps-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.step-num { width: 38px; height: 38px; border-radius: 10px; background: var(--dpr); color: #fff; font-family: var(--fd); font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.step-title { font-family: var(--fd); font-size: 16px; font-weight: 600; color: var(--lhd); margin-bottom: 6px; }
+.step-desc { font-size: 14px; color: var(--lbd); line-height: 1.5; }
+
+/* ── WHAT YOU GET ── */
+.wyg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wyg-item { display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; background: rgba(255,255,255,0.04); border: 0.5px solid var(--dbr); border-radius: 10px; }
+.wyg-icon { width: 38px; height: 38px; border-radius: 8px; background: var(--dpr); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.wyg-icon i { font-size: 18px; color: var(--dlt); }
+.wyg-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 3px; }
+.wyg-desc { font-size: 13px; color: rgba(255,255,255,0.48); line-height: 1.5; }
+
+
+/* ── SPECS ── */
+.specs-table { width: 100%; border-collapse: collapse; }
+.specs-table tr { border-bottom: 0.5px solid var(--lbr); }
+.specs-table tr:last-child { border-bottom: none; }
+.specs-table td { padding: 14px 0; font-size: 14px; vertical-align: top; }
+.specs-table td:first-child { color: var(--lbd); width: 38%; padding-right: 20px; }
+.specs-table td:last-child { color: var(--lhd); font-weight: 500; }
+
+/* ── TESTIMONIALS ── */
+.testimonial-grid { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding: 0 4px 6px; margin: 0 -4px; scrollbar-width: none; }
+.testimonial-grid::-webkit-scrollbar { display: none; }
+.swipe-hint { text-align: center; font-size: 12px; color: var(--lbd); margin-top: 14px; }
+.t-card { flex: 0 0 auto; width: clamp(260px, 78vw, 320px); scroll-snap-align: center; background: #fff; border: 0.5px solid var(--lbr); border-radius: 12px; overflow: hidden; }
+.t-video { aspect-ratio: 9/16; background: var(--dsf); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; max-height: 280px; }
+.t-play { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; }
+.t-play i { font-size: 20px; color: #fff; margin-left: 3px; }
+.t-body { padding: 16px 16px 14px; }
+.t-quote { font-size: 13px; color: var(--lhd); line-height: 1.6; margin-bottom: 12px; }
+.t-person { display: flex; align-items: center; gap: 9px; }
+.t-av { width: 30px; height: 30px; border-radius: 50%; background: var(--dpr); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--dlt); flex-shrink: 0; }
+.t-name { font-size: 13px; font-weight: 500; color: var(--lhd); }
+.t-role { font-size: 12px; color: var(--lbd); }
+
+/* ── FAQ ── */
+details { border-bottom: 0.5px solid var(--lbr); }
+details:first-of-type { border-top: 0.5px solid var(--lbr); }
+summary {
+  padding: 18px 0; font-size: 15px; font-weight: 500; color: var(--lhd);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid var(--dpr); border-bottom: 2px solid var(--dpr); transform: rotate(45deg); flex-shrink: 0; transition: transform 0.2s ease; }
+details[open] summary::after { transform: rotate(225deg); }
+.faq-answer { font-size: 14px; color: var(--lbd); line-height: 1.7; padding-bottom: 18px; max-width: 640px; }
+
+/* ── FOOTER ── */
+/* ── FOOTER (same content as index.html; colours adapt per page) ── */
+footer { background: var(--dbg); color: rgba(255,255,255,0.5); border-top: 1px solid var(--dbr); padding: 44px 48px 30px; }
+footer .wrap { max-width: 1020px; margin: 0 auto; }
+footer .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+footer .logo .ic { width: 32px; height: 32px; flex-shrink: 0; border: 1.5px solid var(--gold); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+footer .logo .tx { font-family: var(--fd); font-weight: 700; font-size: 15px; color: #fff; }
+footer .logo .tx b { color: var(--gold); }
+footer .ftag { font-size: 14px; margin: 12px 0 18px; max-width: 300px; color: rgba(255,255,255,0.5); }
+footer .fcols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 24px 0; }
+footer .fcols h4 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #fff; margin-bottom: 12px; }
+footer .fcols a { display: block; font-size: 14px; margin-bottom: 9px; min-height: 24px; color: rgba(255,255,255,0.5); text-decoration: none; }
+footer .fcols a:hover { color: #fff; }
+footer .fbar { border-top: 1px solid var(--dbr); padding-top: 18px; font-size: 12.5px; }
+footer .socials { display: flex; gap: 10px; margin-top: 6px; }
+footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px solid var(--dbr); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.65); }
+@media (min-width: 768px) { footer .fcols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+
+/* ── SECTION EYEBROWS ── */
+.ey-lt { font-size: 12px; font-weight: 500; letter-spacing: .07em; color: var(--dpr); margin-bottom: 10px; }
+.ey-dk { font-size: 12px; font-weight: 500; letter-spacing: .07em; color: var(--dlt); margin-bottom: 10px; }
+
+/* ── SECTION HEADINGS ── */
+.sec-h { font-family: var(--fd); font-size: 32px; font-weight: 700; line-height: 1.15; margin-bottom: 36px; }
+.sec-h-lt { color: var(--lhd); }
+.sec-h-dk { color: #fff; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+}
+@media (max-width: 720px) {
+  nav { padding: 12px 20px; }
+  footer { padding: 36px 20px 26px; }
+  .product-hero { padding: 24px 20px 40px; }
+  .ph-grid { grid-template-columns: 1fr; gap: 32px; }
+  .ph-viewer { position: static; }
+  .ph-thumbs { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .ph-h1 { font-size: 28px; }
+  .ph-price { font-size: 34px; }
+  .reaction-grid { grid-template-columns: 1fr; gap: 0; }
+  .reaction-item { padding: 24px 0; border-bottom: 0.5px solid var(--lbr); }
+  .reaction-item:last-child { border-bottom: none; }
+  .wyg-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .wyg-item { padding: 12px; gap: 10px; }
+  .wyg-icon { width: 30px; height: 30px; border-radius: 7px; }
+  .wyg-icon i { font-size: 15px; }
+  .wyg-title { font-size: 12.5px; margin-bottom: 2px; }
+  .wyg-desc { font-size: 11px; line-height: 1.35; }
+  #wyg-section.sec-pad { padding-top: 34px !important; padding-bottom: 34px !important; }
+  .steps-row { grid-template-columns: 1fr; gap: 22px; }
+  .t-card { width: 80vw; max-width: 320px; }
+  .sec-h { font-size: 26px; margin-bottom: 24px; }
+  .sticky-bar { padding: 10px 20px; }
+  .sticky-bar-left img { display: none; }
+  /* Collapse all two-column grids */
+  .specs-cols { grid-template-columns: 1fr !important; gap: 36px !important; }
+  .faq-cols { grid-template-columns: 1fr !important; gap: 32px !important; }
+  /* Section padding */
+  .sec-pad { padding-left: 20px !important; padding-right: 20px !important; }
+}
+@media (max-width: 480px) {
+  .finish-chips { gap: 6px; }
+  .finish-chip { font-size: 12px; padding: 5px 10px; }
+  .ph-thumbs { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── CART BUTTON + DRAWER (shared across all pages) ── */
+.cart-btn { position: relative; background: transparent; border: 1.5px solid var(--dbr); color: #fff; font-family: var(--fd); font-size: 14px; font-weight: 600; padding: 8px 16px 8px 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; }
+.cart-btn:hover { border-color: rgba(255,255,255,0.4); }
+.cart-btn i { position: absolute; left: 12px; font-size: 16px; }
+.cart-count { position: absolute; top: -7px; right: -7px; min-width: 19px; height: 19px; padding: 0 5px; background: var(--gold); color: #1a1206; font-size: 11px; font-weight: 800; border-radius: 10px; display: none; align-items: center; justify-content: center; }
+.cart-count.show { display: flex; }
+.cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(2px); opacity: 0; visibility: hidden; transition: 0.25s; z-index: 300; }
+.cart-overlay.open { opacity: 1; visibility: visible; }
+.cart-drawer { position: fixed; top: 0; right: 0; height: 100%; width: 400px; max-width: 92vw; z-index: 310; background: var(--dbg); border-left: 0.5px solid var(--dbr); transform: translateX(100%); transition: transform 0.28s ease; display: flex; flex-direction: column; }
+.cart-drawer.open { transform: translateX(0); }
+.cart-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 22px; border-bottom: 0.5px solid var(--dbr); }
+.cart-drawer-head h2 { font-family: var(--fd); font-size: 19px; font-weight: 700; color: #fff; }
+.cart-close { background: transparent; border: none; color: rgba(255,255,255,0.6); font-size: 26px; line-height: 1; cursor: pointer; }
+.cart-items { flex: 1; overflow-y: auto; padding: 16px 22px; }
+.cart-empty { color: rgba(255,255,255,0.5); text-align: center; padding: 60px 0; font-size: 15px; }
+.citem { display: flex; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid var(--dbr); }
+.citem .thumb { width: 56px; height: 38px; border-radius: 7px; flex-shrink: 0; }
+.citem .ci-name { font-size: 14.5px; font-weight: 600; color: #fff; }
+.citem .ci-price { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.citem .ci-line { font-weight: 700; color: #fff; }
+.qty { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.qty button { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--dbr); background: transparent; color: #fff; font-size: 15px; cursor: pointer; line-height: 1; }
+.ci-qty { font-size: 14px; font-weight: 700; min-width: 18px; text-align: center; color: #fff; }
+.ci-remove { margin-left: auto; background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; text-decoration: underline; }
+.cart-foot { padding: 18px 22px 24px; border-top: 0.5px solid var(--dbr); }
+.cart-subtotal { display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.cart-ship { color: var(--green); font-size: 12.5px; margin-bottom: 16px; }
+.cart-checkout { width: 100%; padding: 15px 0; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; background: var(--gold); color: var(--dbg); font-family: var(--fd); }
+.cart-checkout:disabled { opacity: 0.5; cursor: not-allowed; }
+.cart-paynote { text-align: center; color: rgba(255,255,255,0.35); font-size: 11.5px; margin-top: 12px; }
+@media (max-width: 480px) { .cart-drawer { width: 100%; } }
+</style>
+</head>
+<body data-product="wooden">
+
+<!-- STICKY BUY BAR (appears after scrolling past hero) -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-bar-left">
+    <img src="/assets/images/wood-bamboo-photo.webp" alt="Wooden card" id="stickyBarImg">
+    <div>
+      <p style="font-size:13px;font-weight:500;color:#fff;margin:0;white-space:nowrap;" id="stickyBarName">Wooden NFC card — Bamboo</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0;white-space:nowrap;">Free UK delivery</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span class="sticky-bar-price">£99</span>
+    <a href="#" class="gbtn" style="padding:10px 22px;font-size:14px;white-space:nowrap;" onclick="addToCart();return false;">Order now</a>
+  </div>
+</div>
+
+<!-- NAV (consistent with index.html) -->
+<header class="site-nav">
+  <a class="nav-logo-link" href="/">
+    <span class="nav-logo-icon">
+      <img src="/exposureboostlogo/rocketlogo.svg" alt="ExposureBoost" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+    </span>
+    <span class="nav-logo-text">EXPOSURE<b>BOOST</b></span>
+  </a>
+  <ul class="nav-menu">
+    <li><a href="/metal">Metal</a></li>
+    <li><a href="/wood" class="active">Wood</a></li>
+    <li><a href="/plastic">Plastic</a></li>
+    <li><a href="/stands">Stands</a></li>
+    <li><a href="/keyrings">Keyrings</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a class="nav-signin2" href="https://app.exposureboost.co.uk" target="_blank" rel="noopener">Sign in</a>
+    <button class="nav-cart" id="openCart" aria-label="Open cart"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h11L21 7H6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="#fff"/><circle cx="18" cy="20" r="1.4" fill="#fff"/></svg><span class="cart-count" id="cartCount">0</span></button>
+    <button class="nav-buy" id="navBuy">Buy now</button>
+    <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="nav-drop" id="navDrop" aria-label="Mobile menu">
+    <a href="/metal">Metal</a>
+    <a href="/wood">Wood</a>
+    <a href="/plastic">Plastic</a>
+    <a href="/stands">Stands</a>
+    <a href="/keyrings">Keyrings</a>
+    <a href="https://app.exposureboost.co.uk" target="_blank" rel="noopener">Sign in</a>
+  </nav>
+</header>
+<script>
+  (function(){
+    var b = document.getElementById('navBurger'), d = document.getElementById('navDrop');
+    if (b && d) {
+      b.addEventListener('click', function(){
+        var open = d.classList.toggle('open');
+        b.classList.toggle('open', open);
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      d.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){ d.classList.remove('open'); b.classList.remove('open'); b.setAttribute('aria-expanded','false'); });
+      });
+    }
+    var buy = document.getElementById('navBuy');
+    if (buy) buy.addEventListener('click', function(){ var t = document.getElementById('productHero'); if (t) t.scrollIntoView({ behavior:'smooth' }); });
+  })();
+</script>
+
+<!-- PRODUCT HERO -->
+<section class="product-hero" id="productHero">
+  <div class="mw">
+    <div class="breadcrumb" style="margin-bottom:20px;">
+      <a href="/">Home</a> &nbsp;/&nbsp; Wooden NFC cards
+    </div>
+
+    <div class="ph-grid">
+
+      <!-- LEFT: Image viewer + colour selector + add to cart -->
+      <div class="ph-viewer">
+        <div class="ph-main">
+          <img src="/assets/images/wood-bamboo-photo.webp" alt="Wooden NFC business card — Bamboo finish" id="mainCardImg">
+        </div>
+
+        <p class="ph-colour-sel">Wood: <span id="selectedFinish">Bamboo</span></p>
+
+        <!-- Tap a card to change the colour & main image -->
+        <div class="ph-thumbs" id="thumbGrid">
+          <div class="ph-thumb active" onclick="switchFinish(this, '/assets/images/wood-bamboo-photo.webp', 'Bamboo', '£70')"><img src="/assets/images/wood-bamboo-photo.webp" alt="Bamboo"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-walnut-photo.webp', 'Walnut', '£70')"><img src="/assets/images/wood-walnut-photo.webp" alt="Walnut"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-maple-photo.webp', 'Maple', '£70')"><img src="/assets/images/wood-maple-photo.webp" alt="Maple"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-cherry-photo.webp', 'Cherry', '£70')"><img src="/assets/images/wood-cherry-photo.webp" alt="Cherry"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-sapele-photo.webp', 'Sapele', '£70')"><img src="/assets/images/wood-sapele-photo.webp" alt="Sapele"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-blackbamboo-photo.webp', 'Black bamboo', '£70')"><img src="/assets/images/wood-blackbamboo-photo.webp" alt="Black bamboo"></div>
+        </div>
+
+        <!-- Compact buy row -->
+        <div class="ph-buy">
+          <div class="ph-buy-price"><span id="displayPrice">£70</span><small>one-time · free UK delivery</small></div>
+          <button class="ph-add" id="addBtn" onclick="addToCart()">Add to cart</button>
+        </div>
+        <a class="ph-vb" id="viewBasket" href="#">View basket &amp; checkout →</a>
+      </div>
+
+      <!-- RIGHT: Product info -->
+      <div class="ph-info">
+        <span class="product-tag">Bestseller</span>
+        <h1 class="ph-h1">Wooden NFC business card</h1>
+        <div class="ph-rating">
+          <span class="ph-stars">★★★★★</span>
+          <span>4.9 · 127 reviews</span>
+        </div>
+        <p class="ph-tagline">The card people pick up and ask about. Laser-engraved into real wood. Tap to share everything, instantly.</p>
+
+        <hr class="ph-divider">
+
+        <!-- What's included -->
+        <ul class="ph-includes">
+          <li><i class="ti ti-check"></i>Custom laser-engraved to your logo and branding</li>
+          <li><i class="ti ti-check"></i>Digital profile — website, socials, contact, reviews</li>
+          <li><i class="ti ti-check"></i>Free profile updates forever, change anytime</li>
+          <li><i class="ti ti-check"></i>QR code backup engraved on reverse</li>
+          <li><i class="ti ti-check"></i>Free UK delivery in protective sleeve</li>
+        </ul>
+
+        <!-- Specs accordion -->
+        <div class="spec-acc">
+          <button type="button" class="spec-acc-toggle" id="specAccToggle" aria-expanded="false" aria-controls="specAccPanel">
+            <span>Specs</span>
+            <i class="ti ti-chevron-down spec-acc-chev"></i>
+          </button>
+          <div class="spec-acc-panel" id="specAccPanel" hidden>
+            <table class="specs-table">
+              <tr><td>Material</td><td>Genuine wood, sustainably sourced, sealed finish</td></tr>
+              <tr><td>Size</td><td>85.6 × 54 mm (standard credit card)</td></tr>
+              <tr><td>Thickness</td><td>1.0mm</td></tr>
+              <tr><td>NFC chip</td><td>NTAG213 · 180 bytes · unlimited taps</td></tr>
+              <tr><td>Works on</td><td>All iPhones (iOS 13+) and Android (5.0+). No app required.</td></tr>
+              <tr><td>QR code</td><td>Engraved on reverse, works with any phone camera</td></tr>
+              <tr><td>Delivery</td><td>3–5 working days standard · Express available</td></tr>
+            </table>
+          </div>
+        </div>
+        <script>
+          (function(){
+            var t = document.getElementById('specAccToggle'), p = document.getElementById('specAccPanel');
+            if(!t || !p) return;
+            t.addEventListener('click', function(){
+              var open = t.getAttribute('aria-expanded') === 'true';
+              t.setAttribute('aria-expanded', open ? 'false' : 'true');
+              p.hidden = open;
+            });
+          })();
+        </script>
+
+        <a href="https://wa.me/447754888841?text=Hi%2C+I%27d+like+to+order+a+wooden+NFC+card" class="ph-wa-link" style="justify-content:flex-start;padding:0 0 16px;">
+          <i class="ti ti-brand-whatsapp" style="color:var(--green);font-size:16px;"></i>
+          Prefer to order over WhatsApp? Message us
+        </a>
+
+        <!-- Trust badges -->
+        <div class="ph-trust">
+          <div class="ph-badge"><i class="ti ti-truck"></i>Free UK delivery</div>
+          <div class="ph-badge"><i class="ti ti-refresh"></i>Free updates forever</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- THE REACTION -->
+<section style="background:var(--lbg);padding:68px 48px;" class="sec-pad">
+  <div class="mw">
+    <p class="ey-lt">Why wood</p>
+    <h2 class="sec-h sec-h-lt">The moment they feel it, everything changes.</h2>
+    <div class="reaction-grid">
+      <div class="reaction-item">
+        <div class="reaction-icon"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+        <p class="reaction-title">Real, natural wood</p>
+        <p class="reaction-text">Sustainably sourced, sealed and warm to the touch. No two are identical — the grain makes every card one of a kind.</p>
+      </div>
+      <div class="reaction-item">
+        <div class="reaction-icon"><i class="ti ti-phone-call" aria-hidden="true"></i></div>
+        <p class="reaction-title">One tap, everything</p>
+        <p class="reaction-text">Hold it to any phone. Your profile opens instantly — no app, no friction. Contact saved, LinkedIn connected, job done.</p>
+      </div>
+      <div class="reaction-item">
+        <div class="reaction-icon"><i class="ti ti-repeat" aria-hidden="true"></i></div>
+        <p class="reaction-title">It never goes out of date</p>
+        <p class="reaction-text">Changed jobs? New number? New website? Update your profile in seconds — the physical card never changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER PROCESS -->
+<section style="background:var(--lsf);padding:68px 48px;border-top:0.5px solid var(--lbr);" class="sec-pad">
+  <div class="mw">
+    <p class="ey-lt">How it works</p>
+    <h2 class="sec-h sec-h-lt">From order to doorstep in 4 steps.</h2>
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <p class="step-title">Order</p>
+        <p class="step-desc">Place your order and pay securely online.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <p class="step-title">Upload your logo</p>
+        <p class="step-desc">Send us your logo and any design notes.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <p class="step-title">Approve your proof</p>
+        <p class="step-desc">We'll send a design proof within 24 hours.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <p class="step-title">Delivered</p>
+        <p class="step-desc">Your card arrives within 5 working days.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU GET -->
+<section id="wyg-section" style="background:var(--dbg);padding:68px 48px;border-top:0.5px solid var(--dbr);" class="sec-pad">
+  <div class="mw">
+    <p class="ey-dk">Everything included</p>
+    <h2 class="sec-h sec-h-dk">What you're getting for £70.</h2>
+    <div class="wyg-grid">
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">Custom wooden card</p>
+          <p class="wyg-desc">Your logo and branding laser-engraved into genuine sustainable wood. Credit-card size, sealed finish, warm and distinctive.</p>
+        </div>
+      </div>
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-world" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">Digital profile</p>
+          <p class="wyg-desc">Your own hosted profile page — phone, email, website, socials, Google reviews, booking links. All in one tap.</p>
+        </div>
+      </div>
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-qrcode" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">QR code backup</p>
+          <p class="wyg-desc">Engraved on the reverse. Works on any camera. No NFC? No problem — they still get your full profile.</p>
+        </div>
+      </div>
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-edit" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">Free updates forever</p>
+          <p class="wyg-desc">Change your number, job title, links — anytime, for free, directly in your dashboard. No reprinting, ever.</p>
+        </div>
+      </div>
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">Tap analytics</p>
+          <p class="wyg-desc">See how many times your card's been tapped, when, and what people clicked. Know your card is working.</p>
+        </div>
+      </div>
+      <div class="wyg-item">
+        <div class="wyg-icon"><i class="ti ti-package" aria-hidden="true"></i></div>
+        <div>
+          <p class="wyg-title">Free UK delivery</p>
+          <p class="wyg-desc">Dispatched within 48 hours in a protective sleeve. Standard 3-5 day delivery, express available at checkout.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--lsf);padding:68px 48px;border-top:0.5px solid var(--lbr);" class="sec-pad">
+  <div class="mw">
+    <p class="ey-lt">Real customers</p>
+    <h2 class="sec-h sec-h-lt">The card that sells itself.</h2>
+    <div class="testimonial-grid">
+      <div class="t-card">
+        <div class="t-video">
+          <!-- Replace src with real video embed when available -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+            <div class="t-play"><i class="ti ti-player-play"></i></div>
+            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
+          </div>
+        </div>
+        <div class="t-body">
+          <p class="t-quote">"People at chapter ask about it every single week. Four members have ordered since seeing mine."</p>
+          <div class="t-person">
+            <div class="t-av">DM</div>
+            <div>
+              <p class="t-name">David Mitchell</p>
+              <p class="t-role">Chartered accountant · BNI Altrincham</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-video">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+            <div class="t-play"><i class="ti ti-player-play"></i></div>
+            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
+          </div>
+        </div>
+        <div class="t-body">
+          <p class="t-quote">"My clients always mention the card when they book. It's become part of how people recognise my brand."</p>
+          <div class="t-person">
+            <div class="t-av">ET</div>
+            <div>
+              <p class="t-name">Emma Thorpe</p>
+              <p class="t-role">Solicitor · BNI Manchester North</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-video">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+            <div class="t-play"><i class="ti ti-player-play"></i></div>
+            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
+          </div>
+        </div>
+        <div class="t-body">
+          <p class="t-quote">"Worth every penny. I stopped printing paper cards the week it arrived. Never looked back."</p>
+          <div class="t-person">
+            <div class="t-av">RB</div>
+            <div>
+              <p class="t-name">Rob Barnes</p>
+              <p class="t-role">Mortgage broker · BNI Leeds West</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="swipe-hint">← swipe to see more →</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--lbg);padding:68px 48px;border-top:0.5px solid var(--lbr);" class="sec-pad">
+  <div class="mw">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;" class="faq-cols">
+      <div>
+        <p class="ey-lt">Questions answered</p>
+        <h2 class="sec-h sec-h-lt" style="margin-bottom:8px;">Everything you need to know.</h2>
+        <p style="font-size:15px;color:var(--lbd);margin-bottom:28px;">Still unsure? Message us on WhatsApp and we'll answer within the hour.</p>
+        <a href="https://wa.me/447754888841" class="gbtn">Chat on WhatsApp</a>
+      </div>
+      <div>
+        <details>
+          <summary>Will it work on my clients' iPhones?</summary>
+          <p class="faq-answer">Yes, absolutely. All iPhones from iPhone 7 onwards (iOS 13+) read NFC natively — no app needed. They just hold the card to the top of their phone and your profile opens in Safari instantly. Android phones work the same way from Android 5.0+, which covers virtually every phone made since 2015.</p>
+        </details>
+        <details>
+          <summary>What does the digital profile actually look like?</summary>
+          <p class="faq-answer">Your profile is a clean, branded page with your photo, name, job title, and a set of link buttons — phone, email, website, LinkedIn, WhatsApp, Google review link, booking page, or whatever's most relevant to your business. It opens in the browser so there's nothing to download or install. You can see a live example by tapping the card on our homepage.</p>
+        </details>
+        <details>
+          <summary>Can I update my profile after the card arrives?</summary>
+          <p class="faq-answer">Yes, any time. Log into your dashboard and make any changes — your profile updates immediately and your card taps to the new version right away. Changed jobs, got a new number, launched a new website? Just update your profile. No reprinting, no cost.</p>
+        </details>
+        <details>
+          <summary>What if someone doesn't have NFC or is using an older phone?</summary>
+          <p class="faq-answer">Every card has a QR code engraved on the back. Anyone can open their phone camera, scan the QR, and see your profile — it works on any smartphone, old or new. You're always covered.</p>
+        </details>
+        <details>
+          <summary>Is there a monthly fee or subscription?</summary>
+          <p class="faq-answer">No subscription, ever. You pay once for the card and that's it. Your profile is hosted, your updates are free, and your analytics are included — all for the one-time price. We don't charge you to exist.</p>
+        </details>
+        <details>
+          <summary>How do I send you my logo and design?</summary>
+          <p class="faq-answer">During checkout you'll upload your logo file (PDF, AI, EPS, or high-res PNG all work). If you don't have a design, you can describe what you want and our team will create a proof for you to approve before we engrave anything. Nothing gets made until you're happy with how it looks.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:var(--dpr);padding:64px 48px;border-top:0.5px solid rgba(255,255,255,0.1);" class="sec-pad">
+  <div class="mw" style="text-align:center;">
+    <p class="ey-dk" style="color:rgba(255,255,255,0.55);margin-bottom:12px;">Ready to make your mark?</p>
+    <h2 class="fd" style="font-size:34px;font-weight:700;margin-bottom:12px;">Order today. In their hand within the week.</h2>
+    <p style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:30px;">From £70 · Free UK delivery</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="#" class="gbtn gbtn-lg" onclick="addToCart();return false;">Order your wooden card</a>
+      <a href="https://wa.me/447754888841" style="background:transparent;border:1.5px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);font-size:15px;font-weight:500;padding:15px 24px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+        <i class="ti ti-brand-whatsapp" style="font-size:17px;color:var(--green);"></i>Message us first
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CART DRAWER (shared across all pages) -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+  <div class="cart-drawer-head">
+    <h2>Your cart</h2>
+    <button class="cart-close" id="cartClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">£0</span></div>
+    <div class="cart-ship">✓ Free UK delivery included</div>
+    <button class="cart-checkout" id="cartCheckout" disabled>Checkout securely</button>
+    <p class="cart-paynote">🔒 Payments secured by Stripe</p>
+  </div>
+</aside>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <a class="logo" href="/">
+      <span class="ic">
+        <img src="/exposureboostlogo/rocketlogo.svg" alt="ExposureBoost" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
+      </span>
+      <span class="tx">EXPOSURE<b>BOOST</b></span>
+    </a>
+    <p class="ftag">The NFC business card for professionals. Tap, share, and never run out again.</p>
+    <div class="fcols">
+      <div>
+        <h4>Shop</h4>
+        <a href="/#products">All products</a>
+        <a href="/metal">Metal card</a>
+        <a href="/wood">Wooden card</a>
+        <a href="/plastic">Plastic card</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="/#how">How it works</a>
+        <a href="/#faq">FAQ</a>
+        <a href="mailto:ediz@exposureboost.com">Contact</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Terms</a>
+        <a href="#">Refunds</a>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <div class="socials">
+          <a href="https://instagram.com/exposureboost" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="7" r="1.2" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="fbar">© 2026 ExposureBoost. All rights reserved. · Free UK delivery</div>
+  </div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  SHARED CART  — same localStorage key ("eb_cart"), catalog and
+//  checkout as the homepage, so the basket follows the visitor across
+//  every page (home, product pages, shop) and into checkout.
+// ════════════════════════════════════════════════════════════
+const ORDER_FORM_URL = "https://exposureboost-checkout.exposureboost.workers.dev";
+// Prices are enforced in the Worker — keep these in sync with worker/worker.js.
+const CATALOG = {
+  metal:   { name: "Metal NFC Card",   price: 99, thumb: "linear-gradient(150deg,#e8eaed,#9498a0)" },
+  wooden:  { name: "Wooden NFC Card",  price: 70, thumb: "linear-gradient(150deg,#9c6a37,#5e3c1d)" },
+  plastic: { name: "Plastic NFC Card", price: 70, thumb: "linear-gradient(155deg,#f7c948,#e0991a)" },
+  stand:   { name: "NFC Stand", price: 99, thumb: "linear-gradient(160deg,#241845,#3a2a66)" },
+  keyring: { name: "NFC Keyring (3-pack)", price: 60, thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
+};
+const CART_KEY = "eb_cart";
+const $ = id => document.getElementById(id);
+let cart = [];
+try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch (e) {}
+const saveCart = () => localStorage.setItem(CART_KEY, JSON.stringify(cart));
+
+function cartAdd(id, finish, img) {
+  finish = finish || "";
+  const line = cart.find(i => i.id === id && (i.finish || "") === finish);
+  if (line) { line.qty++; if (img) line.img = img; } else cart.push({ id, finish, img: img || "", qty: 1 });
+  saveCart(); renderCart();
+}
+function cartSetQty(idx, delta) {
+  const line = cart[idx];
+  if (!line) return;
+  line.qty += delta;
+  if (line.qty <= 0) cart.splice(idx, 1);
+  saveCart(); renderCart();
+}
+function cartRemove(idx) { cart.splice(idx, 1); saveCart(); renderCart(); }
+
+function renderCart() {
+  const count = cart.reduce((n, i) => n + i.qty, 0);
+  const cc = $("cartCount");
+  if (cc) { cc.textContent = count; cc.classList.toggle("show", count > 0); }
+  const wrap = $("cartItems");
+  if (wrap) {
+    if (!cart.length) {
+      wrap.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Add a card to get started.</div>';
+    } else {
+      wrap.innerHTML = cart.map((i, idx) => {
+        const p = CATALOG[i.id]; if (!p) return "";
+        const label = i.finish ? `${p.name} — ${i.finish}` : p.name;
+        return `<div class="citem">
+          <div class="thumb" style="background:${i.img ? '#fff' : p.thumb}">${i.img ? '<img src="' + i.img + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:7px;">' : ''}</div>
+          <div style="flex:1">
+            <div class="ci-name">${label}</div>
+            <div class="ci-price">£${p.price} each</div>
+            <div class="qty">
+              <button data-dec="${idx}">−</button>
+              <span class="ci-qty">${i.qty}</span>
+              <button data-inc="${idx}">+</button>
+              <button class="ci-remove" data-rem="${idx}">Remove</button>
+            </div>
+          </div>
+          <div class="ci-line">£${p.price * i.qty}</div>
+        </div>`;
+      }).join("");
+    }
+  }
+  const total = cart.reduce((s, i) => s + (CATALOG[i.id] ? CATALOG[i.id].price * i.qty : 0), 0);
+  if ($("cartSubtotal")) $("cartSubtotal").textContent = "£" + total;
+  if ($("cartCheckout")) $("cartCheckout").disabled = cart.length === 0;
+}
+
+function openCart() { $("cartDrawer").classList.add("open"); $("cartOverlay").classList.add("open"); }
+function closeCart() { $("cartDrawer").classList.remove("open"); $("cartOverlay").classList.remove("open"); }
+
+if ($("openCart")) $("openCart").addEventListener("click", openCart);
+if ($("cartClose")) $("cartClose").addEventListener("click", closeCart);
+if ($("cartOverlay")) $("cartOverlay").addEventListener("click", closeCart);
+if ($("cartItems")) $("cartItems").addEventListener("click", e => {
+  const t = e.target;
+  if (t.dataset.inc) cartSetQty(+t.dataset.inc, 1);
+  if (t.dataset.dec) cartSetQty(+t.dataset.dec, -1);
+  if (t.dataset.rem) cartRemove(+t.dataset.rem);
+});
+if ($("cartCheckout")) $("cartCheckout").addEventListener("click", () => {
+  if (!cart.length) return;
+  const btn = $("cartCheckout"); btn.disabled = true; btn.textContent = "Redirecting…";
+  const cartStr = cart.map(i => `${i.id}:${i.finish || ""}:${i.qty}`).join(",");
+  window.location.href = `${ORDER_FORM_URL}/?cart=${encodeURIComponent(cartStr)}`;
+});
+// keep in sync if the cart changes in another tab
+window.addEventListener("storage", e => {
+  if (e.key === CART_KEY) { try { cart = JSON.parse(e.newValue || "[]"); } catch (_) {} renderCart(); }
+});
+
+// ── Add to cart (product hero button) ──
+function currentFinish() {
+  const el = document.getElementById('selectedFinish');
+  return el ? el.textContent.trim() : "";
+}
+function currentImg() {
+  const el = document.getElementById('mainCardImg');
+  return el ? el.getAttribute('src') : "";
+}
+function addToCart() {
+  const id = document.body.getAttribute('data-product') || 'metal';
+  cartAdd(id, currentFinish(), currentImg());
+  const btn = $("addBtn");
+  if (btn) {
+    btn.textContent = '✓ Added to basket'; btn.classList.add('added');
+    setTimeout(() => { btn.textContent = 'Add to cart'; btn.classList.remove('added'); }, 1400);
+  }
+  const vb = $("viewBasket"); if (vb) vb.style.display = 'inline-flex';
+  openCart();
+}
+// "View basket & checkout" opens the drawer instead of leaving the page
+const viewBasketLink = $("viewBasket");
+if (viewBasketLink) viewBasketLink.addEventListener("click", e => { e.preventDefault(); openCart(); });
+
+// ── Colour switcher (driven by the image thumbnails) ──
+function switchFinish(clickedThumb, imgSrc, finishName, price) {
+  const mainImg = document.getElementById('mainCardImg');
+  mainImg.style.opacity = '0';
+  setTimeout(() => { mainImg.src = imgSrc; mainImg.style.opacity = '1'; }, 150);
+  document.querySelectorAll('.ph-thumb').forEach(t => t.classList.remove('active'));
+  if (clickedThumb) clickedThumb.classList.add('active');
+  document.getElementById('selectedFinish').textContent = finishName;
+  document.getElementById('displayPrice').textContent = price;
+  // Update sticky bar
+  const sImg = document.getElementById('stickyBarImg'); if (sImg) sImg.src = imgSrc;
+  const sName = document.getElementById('stickyBarName');
+  if (sName) sName.textContent = (document.title.split(' ')[0]) + ' NFC card — ' + finishName;
+  const sPrice = document.querySelector('.sticky-bar-price'); if (sPrice) sPrice.textContent = price;
+}
+
+// ── Sticky buy bar ──
+const stickyBar = document.getElementById('stickyBar');
+const hero = document.getElementById('productHero');
+const navHeight = document.querySelector('.site-nav').offsetHeight;
+
+const observer = new IntersectionObserver(entries => {
+  const heroBottom = entries[0].boundingClientRect.bottom;
+  stickyBar.classList.toggle('visible', heroBottom < navHeight);
+}, { threshold: 0, rootMargin: '-' + navHeight + 'px 0px 0px 0px' });
+observer.observe(hero);
+
+// Image transition CSS
+document.getElementById('mainCardImg').style.transition = 'opacity 0.15s';
+
+renderCart();
+</script>
+</body>
+</html>
