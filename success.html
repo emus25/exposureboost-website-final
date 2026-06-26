@@ -229,7 +229,9 @@ document
       status.style.color = "#4ade80";
 
       status.innerText =
-        "✓ Logo uploaded successfully. We can now begin production.";
+        "✓ Logo uploaded successfully. Taking you back home…";
+
+      setTimeout(function () { window.location.href = "/"; }, 2000);
 
     } else {
 
