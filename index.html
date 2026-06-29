@@ -414,12 +414,15 @@
   .site .carousel{ display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:4px 18px 14px; margin:0 -18px; scrollbar-width:none; }
   .site .carousel::-webkit-scrollbar{ display:none; }
   .site .tvid{ position:relative; flex:0 0 auto; width:clamp(180px,62vw,230px); scroll-snap-align:center; aspect-ratio:9/16; border-radius:18px; overflow:hidden; cursor:pointer; background:linear-gradient(160deg,#2a1a52,#0E0620); border:1px solid var(--lp-border); box-shadow:0 14px 30px -16px rgba(20,10,32,.45); -webkit-tap-highlight-color:transparent; }
-  .site .tvid .play{ position:absolute; top:44%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; }
+  .site .tvid .thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .site .tvid::after{ content:""; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to top, rgba(14,6,32,.88) 0%, rgba(14,6,32,.30) 36%, rgba(14,6,32,0) 58%); }
+  .site .tvid .play{ position:absolute; top:44%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; z-index:2; }
   .site .tvid .play::after{ content:""; margin-left:4px; border-left:16px solid #231702; border-top:10px solid transparent; border-bottom:10px solid transparent; }
   .site .tvid .meta{ position:absolute; left:12px; right:12px; bottom:12px; color:#fff; z-index:2; text-shadow:0 1px 6px rgba(0,0,0,.6); }
   .site .tvid .meta .stars{ color:var(--gold); font-size:12px; letter-spacing:1px; }
-  .site .tvid .meta .nm{ font-family:var(--font-display); font-weight:700; font-size:15px; margin-top:2px; }
-  .site .tvid .meta .ro{ font-size:12px; color:#e3d7f2; }
+  .site .tvid .meta .nm{ font-family:var(--font-display); font-weight:700; font-size:15px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .site .tvid .meta .ro{ font-size:12px; font-weight:600; color:var(--gold); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .site .tvid .meta .bz{ font-size:12px; color:#e3d7f2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .site .tvid iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; z-index:3; }
   .site .swipe-hint{ text-align:center; font-size:12px; color:var(--lp-body); margin-top:4px; }
 
@@ -827,10 +830,11 @@
            it wraps seamlessly from the end back to the start (and vice-versa).
            Replace each data-yt with a real (vertical) video ID. -->
       <div class="carousel" id="tCarousel">
-        <div class="tvid" data-yt="QieANfkOWHI"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Simon Trick</div><div class="ro">Sports massages</div></div></div>
-        <div class="tvid" data-yt="t4GJNRrmou0"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Nick</div><div class="ro">Picture Framer · Cinnamon Framing</div></div></div>
-        <div class="tvid" data-yt="AAy2e7K4toQ"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Jeev</div><div class="ro">Step8up · HSBC Business Person of the Year 2026</div></div></div>
-        <div class="tvid" data-yt="jbho6LtwSOU"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Rajesh</div><div class="ro">Events Manager · Dilse Bollywood</div></div></div>
+        <div class="tvid" data-yt="t4GJNRrmou0"><img class="thumb" src="https://i.ytimg.com/vi/t4GJNRrmou0/oardefault.jpg" alt="Nick C." loading="lazy"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Nick C.</div><div class="ro">Picture Framer</div><div class="bz">Cinnamon Framing</div></div></div>
+        <div class="tvid" data-yt="jbho6LtwSOU"><img class="thumb" src="https://i.ytimg.com/vi/jbho6LtwSOU/oardefault.jpg" alt="Rajesh S." loading="lazy"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Rajesh S.</div><div class="ro">Events Manager</div><div class="bz">Dilse Bollywood</div></div></div>
+        <div class="tvid" data-yt="OR-X7zb1TWk"><img class="thumb" src="https://i.ytimg.com/vi/OR-X7zb1TWk/oardefault.jpg" alt="Jordan O." loading="lazy"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Jordan O.</div><div class="ro">Personal Trainer</div><div class="bz">Oxfit Coaching</div></div></div>
+        <div class="tvid" data-yt="AAy2e7K4toQ"><img class="thumb" src="https://i.ytimg.com/vi/AAy2e7K4toQ/oardefault.jpg" alt="Jeev S." loading="lazy"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Jeev S.</div><div class="ro">HSBC Business Person 2026</div><div class="bz">Step8up</div></div></div>
+        <div class="tvid" data-yt="QieANfkOWHI"><img class="thumb" src="https://i.ytimg.com/vi/QieANfkOWHI/oardefault.jpg" alt="Simon T." loading="lazy"><div class="play"></div><div class="meta"><div class="stars">★★★★★</div><div class="nm">Simon T.</div><div class="ro">Sports Massage Therapist</div><div class="bz">Real Touch Massage</div></div></div>
       </div>
     </div>
     <div class="wrap"><div class="swipe-hint">← swipe to see more →</div></div>
