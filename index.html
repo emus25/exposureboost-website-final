@@ -391,7 +391,9 @@
   .site .step .st-t{ font-family:var(--font-display); font-weight:600; font-size:16px; color:var(--lp-heading); }
   .site .step .st-d{ font-size:14px; color:var(--lp-body); margin-top:1px; }
   .site .video{ position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:linear-gradient(150deg,#241845,#0E0620); cursor:pointer; border:1px solid var(--lp-border); -webkit-tap-highlight-color:transparent; }
-  .site .video .play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:64px; height:64px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .site .video .thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .site .video::after{ content:""; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to top, rgba(14,6,32,.78) 0%, rgba(14,6,32,.18) 34%, rgba(14,6,32,0) 56%); }
+  .site .video .play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:64px; height:64px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(0,0,0,.4); z-index:2; }
   .site .video .play::after{ content:""; margin-left:5px; border-left:20px solid #231702; border-top:12px solid transparent; border-bottom:12px solid transparent; }
   .site .video .vlabel{ position:absolute; left:14px; bottom:12px; color:#fff; font-size:13px; font-family:var(--font-display); font-weight:600; z-index:2; }
   .site .video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
@@ -793,7 +795,8 @@
         <div class="step"><div class="n">3</div><div><div class="st-t">Tap &amp; share</div><div class="st-d">Tap any phone to connect</div></div></div>
       </div>
       <!-- Tap-to-play video. Replace data-yt with your real YouTube ID. -->
-      <div class="video">
+      <div class="video" data-yt="6CeJA_Er0yY">
+        <img class="thumb" src="https://i.ytimg.com/vi/6CeJA_Er0yY/maxresdefault.jpg" alt="Watch the demo" loading="lazy">
         <div class="play"></div>
         <div class="vlabel">▶ Watch the 45s demo</div>
       </div>
