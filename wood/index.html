@@ -143,12 +143,17 @@ body { font-family: system-ui, -apple-system, sans-serif; font-size: 16px; line-
 .finish-chip {
   background: var(--dsf); border: 1.5px solid var(--dbr);
   border-radius: 6px; padding: 6px 12px;
-  font-size: 13px; color: rgba(255,255,255,0.65);
+  font-size: 13px; color: rgba(255,255,255,0.65); font-family: inherit;
   cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
 }
 .finish-chip:hover { border-color: rgba(212,168,67,0.4); color: #fff; }
 .finish-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
 .finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.finish-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; margin: 10px 0 0; }
+@keyframes finishShake { 0%,100%{ transform: translateX(0); } 20%,60%{ transform: translateX(-5px); } 40%,80%{ transform: translateX(5px); } }
+#finishBlock.finish-required { animation: finishShake 0.4s ease; }
+#finishBlock.finish-required .finish-chip { border-color: #ff7a7a; color: #ff7a7a; }
+.finish-label.finish-required, .finish-label.finish-required span { color: #ff7a7a; }
 
 /* Divider */
 .ph-divider { border: none; border-top: 0.5px solid var(--dbr); margin: 22px 0; }
@@ -436,6 +441,14 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-cherry-photo.webp', 'Cherry', '£70')"><img src="/assets/images/wood-cherry-photo.webp" alt="Cherry"></div>
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-sapele-photo.webp', 'Sapele', '£70')"><img src="/assets/images/wood-sapele-photo.webp" alt="Sapele"></div>
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-blackbamboo-photo.webp', 'Black bamboo', '£70')"><img src="/assets/images/wood-blackbamboo-photo.webp" alt="Black bamboo"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/wood-oak-photo.webp', 'Oak', '£70')"><img src="/assets/images/wood-oak-photo.webp" alt="Oak"></div>
+        </div>
+
+        <!-- Finish (updates the photo, name & cart line). -->
+        <p class="finish-label" style="margin-top:4px;">Finish: <span id="selectedEngraving">Select an option</span></p>
+        <div id="finishBlock" style="margin-bottom:24px;">
+          <div class="finish-chips" id="finishChips" style="margin-bottom:0;"></div>
+          <p class="finish-desc" id="finishDesc"></p>
         </div>
 
         <!-- Compact buy row -->
@@ -844,7 +857,7 @@ function renderCart() {
     } else {
       wrap.innerHTML = cart.map((i, idx) => {
         const p = CATALOG[i.id]; if (!p) return "";
-        const label = i.finish ? `${p.name} — ${i.finish}` : p.name;
+        const label = lineLabel(i, p);
         return `<div class="citem">
           <div class="thumb" style="background:${i.img ? '#fff' : p.thumb}">${i.img ? '<img src="' + i.img + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:7px;">' : ''}</div>
           <div style="flex:1">
@@ -890,16 +903,40 @@ window.addEventListener("storage", e => {
   if (e.key === CART_KEY) { try { cart = JSON.parse(e.newValue || "[]"); } catch (_) {} renderCart(); }
 });
 
+// Cart line title. Wood items store finish as "Colour - Finish" and read
+// e.g. "Walnut Wood Card - Engraved"; other products keep "Name — finish".
+function lineLabel(i, p) {
+  if (!i.finish) return p.name;
+  if (i.id === 'wooden') {
+    const parts = i.finish.split(' - ');
+    if (parts.length === 2) return parts[0] + ' Wood Card - ' + parts[1];
+  }
+  return `${p.name} — ${i.finish}`;
+}
+
 // ── Add to cart (product hero button) ──
 function currentFinish() {
-  const el = document.getElementById('selectedFinish');
-  return el ? el.textContent.trim() : "";
+  return selColour + " - " + finishLabel();
 }
 function currentImg() {
   const el = document.getElementById('mainCardImg');
   return el ? el.getAttribute('src') : "";
 }
 function addToCart() {
+  // Finish is required — nudge the customer to pick one before adding.
+  if (!finishComplete()) {
+    const block = document.getElementById('finishBlock');
+    const lbl   = document.querySelector('.finish-label');
+    (lbl || block).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    [block, lbl].forEach(function(el) {
+      if (!el) return;
+      el.classList.remove('finish-required');
+      void el.offsetWidth;
+      el.classList.add('finish-required');
+      setTimeout(() => el.classList.remove('finish-required'), 1600);
+    });
+    return;
+  }
   const id = document.body.getAttribute('data-product') || 'metal';
   cartAdd(id, currentFinish(), currentImg());
   const btn = $("addBtn");
@@ -914,21 +951,93 @@ function addToCart() {
 const viewBasketLink = $("viewBasket");
 if (viewBasketLink) viewBasketLink.addEventListener("click", e => { e.preventDefault(); openCart(); });
 
-// ── Colour switcher (driven by the image thumbnails) ──
-function switchFinish(clickedThumb, imgSrc, finishName, price) {
+// ── Colour + finish selection (both drive the photo, name & cart line) ──
+// Finish options mirror the in-person order form: wood cards are Printed or Engraved.
+const FINISHES = ["Printed", "Engraved"];
+
+// Shown under the finish buttons, only after a finish is chosen.
+const FINISH_DESC = {
+  "Printed":  "Full-colour print on the wood — best for unique coloured logos & designs.",
+  "Engraved": "Laser-engraved into the wood for a natural, premium look.",
+};
+
+let selColour      = "Bamboo";
+let selColourImg   = "/assets/images/wood-bamboo-photo.webp";
+let selColourPrice = "£70";
+let selFinish      = null;   // required — nothing pre-selected
+
+function finishLabel() { return selFinish || ""; }
+function finishComplete() { return !!selFinish; }
+// Combo photo filename, e.g. Walnut + Engraved -> "walnutwoodengraved.webp".
+// Missing files fall back to the plain colour photo via the image onerror handler.
+function comboSlug() {
+  const colour = selColour.toLowerCase().replace(/\s+/g, "");
+  const fin = (selFinish || "").toLowerCase().replace(/\s+/g, "");
+  return colour + "wood" + fin;
+}
+function comboImg() {
+  if (!selFinish) return selColourImg;
+  return "/assets/images/" + comboSlug() + ".webp";
+}
+
+function renderFinishChips() {
+  const wrap = document.getElementById('finishChips');
+  if (!wrap) return;
+  selFinish = null;
+  wrap.innerHTML = "";
+  FINISHES.forEach(function(f) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'finish-chip';
+    b.textContent = f;
+    b.addEventListener('click', function() { switchFinishOption(b, f); });
+    wrap.appendChild(b);
+  });
+}
+
+function switchFinishOption(btn, fin) {
+  selFinish = fin;
+  document.querySelectorAll('#finishChips .finish-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applySelection();
+}
+
+function applySelection() {
+  const img = comboImg();
   const mainImg = document.getElementById('mainCardImg');
-  mainImg.style.opacity = '0';
-  setTimeout(() => { mainImg.src = imgSrc; mainImg.style.opacity = '1'; }, 150);
+  if (mainImg) {
+    mainImg.style.opacity = '0';
+    setTimeout(() => {
+      mainImg.onerror = function () { mainImg.onerror = null; mainImg.src = selColourImg; };
+      mainImg.src = img;
+      mainImg.style.opacity = '1';
+    }, 150);
+  }
+  const selF = document.getElementById('selectedFinish');    if (selF) selF.textContent = selColour;
+  const selE = document.getElementById('selectedEngraving'); if (selE) selE.textContent = selFinish || 'Select an option';
+  const desc = document.getElementById('finishDesc');        if (desc) desc.textContent = selFinish ? (FINISH_DESC[selFinish] || "") : "";
+  const dp   = document.getElementById('displayPrice');      if (dp) dp.textContent = selColourPrice;
+  // Sticky bar
+  const sImg = document.getElementById('stickyBarImg');
+  if (sImg) { sImg.onerror = function () { sImg.onerror = null; sImg.src = selColourImg; }; sImg.src = img; }
+  const sName = document.getElementById('stickyBarName');
+  if (sName) sName.textContent = (document.title.split(' ')[0]) + ' NFC card — ' + selColour;
+  const sPrice = document.querySelector('.sticky-bar-price'); if (sPrice) sPrice.textContent = selColourPrice;
+}
+
+function switchFinish(clickedThumb, imgSrc, finishName, price) {
+  selColour = finishName;
+  selColourImg = imgSrc;
+  selColourPrice = price;
   document.querySelectorAll('.ph-thumb').forEach(t => t.classList.remove('active'));
   if (clickedThumb) clickedThumb.classList.add('active');
-  document.getElementById('selectedFinish').textContent = finishName;
-  document.getElementById('displayPrice').textContent = price;
-  // Update sticky bar
-  const sImg = document.getElementById('stickyBarImg'); if (sImg) sImg.src = imgSrc;
-  const sName = document.getElementById('stickyBarName');
-  if (sName) sName.textContent = (document.title.split(' ')[0]) + ' NFC card — ' + finishName;
-  const sPrice = document.querySelector('.sticky-bar-price'); if (sPrice) sPrice.textContent = price;
+  renderFinishChips();   // resets the finish — must be re-picked per colour
+  applySelection();
 }
+
+// Populate finish options on load (nothing pre-selected)
+renderFinishChips();
+applySelection();
 
 // ── Sticky buy bar ──
 const stickyBar = document.getElementById('stickyBar');

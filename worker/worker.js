@@ -76,11 +76,144 @@ function parseCart(str) {
     });
 }
 
+// Card items store finish as "Colour - Finish" and read as a full title,
+// e.g. "Black Metal Card - Gold Engraving", matching the website cart.
+const CARD_NOUNS = { metal: "Metal Card", wooden: "Wood Card", plastic: "Plastic Card" };
+function itemLabel(item) {
+  const noun = CARD_NOUNS[item.id];
+  if (noun && item.finish) {
+    const parts = item.finish.split(" - ");
+    if (parts.length === 2) return `${parts[0]} ${noun} - ${parts[1]}`;
+  }
+  return null;
+}
+
+// ── NFC Tagify partner-order forwarding ──────────────────────
+// Paid orders are forwarded to NFC Tagify for production. Only the combos below
+// map to a Tagify variant; anything not listed is held as "awaiting integration"
+// and reported in the order's Tagify status (never errors the checkout).
+const TAGIFY_BASE = "https://id.nfctagify.com/api/shopify";
+const TAGIFY_VARIANTS = {
+  // Plastic -> "Classic Digital Business Card" (colour + Matte/Spot Gloss)
+  "plastic|White|Matte": "45087503876390",  "plastic|White|Spot Gloss": "45087503909158",
+  "plastic|Black|Matte": "45165988380966",  "plastic|Black|Spot Gloss": "45165988643110",
+  "plastic|Blue|Matte": "45165988413734",   "plastic|Blue|Spot Gloss": "45165988675878",
+  "plastic|Green|Matte": "45165988446502",  "plastic|Green|Spot Gloss": "45165988708646",
+  "plastic|Orange|Matte": "45165988479270", "plastic|Orange|Spot Gloss": "45165988741414",
+  "plastic|Yellow|Matte": "45165988512038", "plastic|Yellow|Spot Gloss": "45165988774182",
+  "plastic|Pink|Matte": "45165988544806",   "plastic|Pink|Spot Gloss": "45165988806950",
+  "plastic|Red|Matte": "45165988577574",    "plastic|Red|Spot Gloss": "45165988839718",
+  "plastic|Purple|Matte": "45165988610342", "plastic|Purple|Spot Gloss": "45165988872486",
+  "plastic|Silver|Matte": "45944469520678", "plastic|Silver|Spot Gloss": "45944469553446",
+  "plastic|Gold|Matte": "45944469684518",   "plastic|Gold|Spot Gloss": "45944469717286",
+  // Keyring (3-pack) -> "3 x Mini NFC Keyring Fob"
+  "keyring|Regular|": "45288644116774", "keyring|Slanted|": "45288644149542",
+  // Metal coated + engraving -> "Coated Metal Digital Cards - Engraving & Printing"
+  "metal|Black|Silver Engraving": "45258359734566", "metal|Black|Gold Engraving": "45258359767334", "metal|Black|Rose Gold Engraving": "45258360291622",
+  "metal|Blue|Silver Engraving": "45258359800102",  "metal|Blue|Gold Engraving": "45258359832870",
+  "metal|Green|Silver Engraving": "45258359865638", "metal|Green|Gold Engraving": "45258359898406",
+  "metal|Purple|Silver Engraving": "45258359931174","metal|Purple|Gold Engraving": "45258359963942",
+  "metal|White|Silver Engraving": "45258360127782", "metal|White|Gold Engraving": "45258360160550",
+  // Metal brushed printed -> "Brushed Metal Digital Cards - Printed" (defaulting to Matte)
+  "metal|Gold|Printed": "45248270139686", "metal|Silver|Printed": "45248270041382", "metal|Rose gold|Printed": "45248270237990",
+  "metal|Black|Printed": "45248269943078", "metal|White|Printed": "47521023131942",
+  // Wood printed -> "Wooden Digital Business Card - Printing" (defaulting to Matte)
+  "wooden|Bamboo|Printed": "47245115130150", "wooden|Walnut|Printed": "47245115883814", "wooden|Maple|Printed": "47245116047654",
+  "wooden|Cherry|Printed": "47245115556134", "wooden|Sapele|Printed": "47245115392294", "wooden|Black bamboo|Printed": "47245115228454",
+  "wooden|Oak|Printed": "47245115785510",
+};
+
+function splitFinish(finish) {
+  const f = finish || "";
+  const i = f.indexOf(" - ");
+  return i >= 0 ? [f.slice(0, i), f.slice(i + 3)] : [f, ""];
+}
+function tagifyVariant(item) {
+  const [colour, fin] = splitFinish(item.finish);
+  return TAGIFY_VARIANTS[`${item.id}|${colour}|${fin}`] || null;
+}
+function describeItem(item) {
+  return (itemLabel(item) || (PRODUCTS[item.id] && PRODUCTS[item.id].name) || item.id) + ` x${item.qty}`;
+}
+
+// Returns a short human status string for the order's Tagify column. Never throws.
+async function forwardToTagify(env, s, md, orderRef, uploadLink) {
+  if (!env.NFC_TAGIFY_API_KEY) return ""; // integration not configured yet
+  const items = parseCart(md.cart_raw || "");
+  if (!items.length) return "";
+
+  const lineItems = [];
+  const awaiting = [];
+  for (const it of items) {
+    const v = tagifyVariant(it);
+    if (v) lineItems.push({ variant_id: v, quantity: it.qty });
+    else awaiting.push(describeItem(it));
+  }
+
+  if (!lineItems.length) {
+    return `Awaiting integration — not forwarded: ${awaiting.join("; ")}`;
+  }
+
+  const ship = s.shipping_details || (s.collected_information && s.collected_information.shipping_details) || null;
+  const addr = (ship && ship.address) || (s.customer_details && s.customer_details.address) || null;
+  const fullName = (ship && ship.name) || (s.customer_details && s.customer_details.name) || md.customer_name || "Customer";
+  const parts = fullName.trim().split(/\s+/);
+  const firstName = parts.shift() || fullName;
+  const lastName = parts.join(" ") || firstName;
+
+  if (!addr || !addr.line1 || !addr.city || !addr.postal_code) {
+    return `Not forwarded — missing shipping address. Fulfil manually: ${items.map(describeItem).join("; ")}`;
+  }
+
+  // The customer's uploaded logo lands in a Google Drive folder named by Apps
+  // Script as "<order ref> — <company>". Put that name (and the unique order ref)
+  // in the note so the seller can match the order to the artwork on Drive.
+  const custName = md.customer_name || (s.customer_details && s.customer_details.name) || "";
+  const safeName = custName.replace(/[\/:*?"<>|]/g, "-").trim() || "Website Customer";
+  const driveFolder = `${orderRef} — ${safeName}`;
+
+  const body = {
+    email: (s.customer_details && s.customer_details.email) || s.customer_email || "",
+    shipping_address: {
+      first_name: firstName,
+      last_name: lastName,
+      address1: addr.line1,
+      address2: addr.line2 || "",
+      city: addr.city,
+      province: addr.state || "",
+      country: "United Kingdom",
+      zip: addr.postal_code,
+      phone: (s.customer_details && s.customer_details.phone) || md.customer_phone || "",
+    },
+    line_items: lineItems,
+    notes: `ExposureBoost order ${orderRef} | Design/logo in Google Drive folder: "${driveFolder}"`
+      + (awaiting.length ? ` | Also on this order (fulfilled separately): ${awaiting.join("; ")}` : ""),
+  };
+
+  try {
+    const resp = await fetch(`${TAGIFY_BASE}/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.NFC_TAGIFY_API_KEY}` },
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (resp.ok && data.success) {
+      const ref = (data.order && (data.order.shopify_order_name || data.order.id)) || "";
+      const base = `Forwarded ${lineItems.length} item(s) to NFC Tagify ${ref}`.trim();
+      return awaiting.length ? `${base}; awaiting integration: ${awaiting.join("; ")}` : base;
+    }
+    return `Tagify error (${resp.status}) — fulfil manually. ${data.message || ""}`.trim();
+  } catch (e) {
+    return `Tagify request failed — fulfil manually: ${e}`;
+  }
+}
+
 function cartSummary(items) {
   return items
     .map((i) => {
       const name = PRODUCTS[i.id].name;
-      return (i.finish ? `${name} (${i.finish})` : name) + ` x${i.qty}`;
+      const label = itemLabel(i) || (i.finish ? `${name} (${i.finish})` : name);
+      return label + ` x${i.qty}`;
     })
     .join(", ");
 }
@@ -153,7 +286,7 @@ function orderForm(url) {
   const rows = items.length
     ? items.map((i) => {
         const p = PRODUCTS[i.id];
-        const label = i.finish ? `${esc(p.name)} — ${esc(i.finish)}` : esc(p.name);
+        const label = esc(itemLabel(i) || (i.finish ? `${p.name} — ${i.finish}` : p.name));
         return `<div class="srow"><span>${label} &times; ${i.qty}</span><span>${gbp(p.amount * i.qty)}</span></div>`;
       }).join("")
     : `<div class="srow"><span>Your cart is empty</span></div>`;
@@ -210,7 +343,7 @@ async function createOrder(request, env, url) {
 
     items.forEach((it, i) => {
       const p = PRODUCTS[it.id];
-      const lineName = it.finish ? `${p.name} — ${it.finish}` : p.name;
+      const lineName = itemLabel(it) || (it.finish ? `${p.name} — ${it.finish}` : p.name);
 
       params.append(`line_items[${i}][price_data][currency]`, "gbp");
       params.append(`line_items[${i}][price_data][product_data][name]`, lineName);
@@ -408,6 +541,12 @@ async function webhook(request, env) {
     const currency = (s.currency || "gbp").toUpperCase();
     const uploadLink = `${getSiteUrl(env)}/success.html?session_id=${encodeURIComponent(s.id)}`;
 
+    // Forward the order to NFC Tagify for production (never breaks the webhook).
+    let tagifyStatus = "";
+    try {
+      tagifyStatus = await forwardToTagify(env, s, md, orderRef, uploadLink);
+    } catch (_) {}
+
     const row = {
       token: env.SHEET_TOKEN || "",
       date: new Date().toISOString(),
@@ -422,6 +561,7 @@ async function webhook(request, env) {
       logo_url: "",
       session_id: s.id || "",
       upload_link: uploadLink,
+      tagify_status: tagifyStatus,
     };
 
     if (env.SHEET_WEBHOOK_URL) {

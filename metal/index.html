@@ -143,12 +143,17 @@ body { font-family: system-ui, -apple-system, sans-serif; font-size: 16px; line-
 .finish-chip {
   background: var(--dsf); border: 1.5px solid var(--dbr);
   border-radius: 6px; padding: 6px 12px;
-  font-size: 13px; color: rgba(255,255,255,0.65);
+  font-size: 13px; color: rgba(255,255,255,0.65); font-family: inherit;
   cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
 }
 .finish-chip:hover { border-color: rgba(212,168,67,0.4); color: #fff; }
 .finish-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
-.finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); }
+@keyframes finishShake { 0%,100%{ transform: translateX(0); } 20%,60%{ transform: translateX(-5px); } 40%,80%{ transform: translateX(5px); } }
+#finishBlock.finish-required { animation: finishShake 0.4s ease; }
+#finishBlock.finish-required .finish-chip { border-color: #ff7a7a; color: #ff7a7a; }
+.finish-label.finish-required, .finish-label.finish-required span { color: #ff7a7a; }
+.finish-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; margin: 10px 0 0; }
 
 /* Divider */
 .ph-divider { border: none; border-top: 0.5px solid var(--dbr); margin: 22px 0; }
@@ -437,7 +442,17 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-white-photo.webp', 'White', '£99')"><img src="/assets/images/card-white-photo.webp" alt="White"></div>
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-green-photo.webp', 'Green', '£99')"><img src="/assets/images/card-green-photo.webp" alt="Green"></div>
           <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-purple-photo.webp', 'Purple', '£99')"><img src="/assets/images/card-purple-photo.webp" alt="Purple"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-custom-photo.webp', 'Custom', 'From £99')"><img src="/assets/images/card-custom-photo.webp" alt="Custom"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-blue-photo.webp', 'Blue', '£99')"><img src="/assets/images/card-blue-photo.webp" alt="Blue"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-red-photo.webp', 'Red', '£99')"><img src="/assets/images/card-red-photo.webp" alt="Red"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-custom-photo.webp', 'Custom', '£99')"><img src="/assets/images/card-custom-photo.webp" alt="Custom"></div>
+        </div>
+
+        <!-- Engraving / logo finish (metal only). Updates the photo, name & cart line. -->
+        <p class="finish-label" style="margin-top:4px;">Finish: <span id="selectedEngraving">Printed</span></p>
+        <div id="finishBlock" style="margin-bottom:24px;">
+          <div class="finish-chips" id="engraveChips" style="margin-bottom:0;"></div>
+          <div class="finish-chips" id="engraveSub" style="display:none;margin:8px 0 0;"></div>
+          <p class="finish-desc" id="finishDesc"></p>
         </div>
 
         <!-- Compact buy row -->
@@ -835,6 +850,17 @@ function cartSetQty(idx, delta) {
 }
 function cartRemove(idx) { cart.splice(idx, 1); saveCart(); renderCart(); }
 
+// Cart line title. Metal items store finish as "Colour - Finish" and read
+// e.g. "Black Metal Card - Gold Engraving"; other products keep "Name — finish".
+function lineLabel(i, p) {
+  if (!i.finish) return p.name;
+  if (i.id === 'metal') {
+    const parts = i.finish.split(' - ');
+    if (parts.length === 2) return parts[0] + ' Metal Card - ' + parts[1];
+  }
+  return `${p.name} — ${i.finish}`;
+}
+
 function renderCart() {
   const count = cart.reduce((n, i) => n + i.qty, 0);
   const cc = $("cartCount");
@@ -846,7 +872,7 @@ function renderCart() {
     } else {
       wrap.innerHTML = cart.map((i, idx) => {
         const p = CATALOG[i.id]; if (!p) return "";
-        const label = i.finish ? `${p.name} — ${i.finish}` : p.name;
+        const label = lineLabel(i, p);
         return `<div class="citem">
           <div class="thumb" style="background:${i.img ? '#fff' : p.thumb}">${i.img ? '<img src="' + i.img + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:7px;">' : ''}</div>
           <div style="flex:1">
@@ -894,14 +920,27 @@ window.addEventListener("storage", e => {
 
 // ── Add to cart (product hero button) ──
 function currentFinish() {
-  const el = document.getElementById('selectedFinish');
-  return el ? el.textContent.trim() : "";
+  return selColour + " - " + finishLabel();
 }
 function currentImg() {
   const el = document.getElementById('mainCardImg');
   return el ? el.getAttribute('src') : "";
 }
 function addToCart() {
+  // Finish is required — nudge the customer to pick one before adding.
+  if (!finishComplete()) {
+    const block = document.getElementById('finishBlock');
+    const lbl   = document.querySelector('.finish-label');
+    (lbl || block).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    [block, lbl].forEach(function(el) {
+      if (!el) return;
+      el.classList.remove('finish-required');
+      void el.offsetWidth; // restart the animation
+      el.classList.add('finish-required');
+      setTimeout(() => el.classList.remove('finish-required'), 1600);
+    });
+    return;
+  }
   const id = document.body.getAttribute('data-product') || 'metal';
   cartAdd(id, currentFinish(), currentImg());
   const btn = $("addBtn");
@@ -916,21 +955,172 @@ function addToCart() {
 const viewBasketLink = $("viewBasket");
 if (viewBasketLink) viewBasketLink.addEventListener("click", e => { e.preventDefault(); openCart(); });
 
-// ── Colour switcher (driven by the image thumbnails) ──
-function switchFinish(clickedThumb, imgSrc, finishName, price) {
+// ── Colour + finish selection (both drive the photo, name & cart line) ──
+// Two-tier finish picker mirroring the in-person order form
+// (orderform.exposureboost.co.uk): first choose Printed / Engraved / Custom
+// Colour; if the Engraved option has colour sub-tones they reveal underneath.
+const FINISHES_BY_COLOUR = {
+  "Gold":      [{ label: "Printed" }, { label: "Engraved" }],
+  "Silver":    [{ label: "Printed" }, { label: "Engraved" }],
+  "Rose gold": [{ label: "Printed" }, { label: "Engraved" }],
+  "Black":     [{ label: "Printed" }, { label: "Engraved", options: ["Silver", "Gold", "Rose Gold"] }],
+  "White":     [{ label: "Printed" }, { label: "Engraved", options: ["Silver", "Gold"] }],
+  "Green":     [{ label: "Printed" }, { label: "Engraved", options: ["Silver", "Gold"] }],
+  "Purple":    [{ label: "Printed" }, { label: "Engraved", options: ["Silver", "Gold"] }],
+  "Blue":      [{ label: "Printed" }, { label: "Engraved", options: ["Silver", "Gold"] }],
+  "Red":       [{ label: "Printed" }],
+  "Custom":    [{ label: "Printed" }],
+};
+
+// Short benefit line shown under the finish buttons, so people understand the
+// difference between printing (full colour on top) and engraving (etched metal).
+const FINISH_DESC = {
+  "Printed":       "Full-colour print on top of the metal — best for unique coloured logos & designs.",
+  "Engraved":      "Laser-engraved into the metal for a premium, single-tone finish.",
+  "Custom Colour": "Printed in your chosen custom colour.",
+};
+
+// Metallic swatch fills for the engraving sub-tone dots.
+const TONE_COLOURS = {
+  "Silver":    "linear-gradient(135deg,#f4f4f4,#b8b8b8)",
+  "Gold":      "linear-gradient(135deg,#f6d873,#c99a2e)",
+  "Rose Gold": "linear-gradient(135deg,#f3c9bd,#c07f74)",
+};
+
+let selColour      = "Gold";
+let selColourImg   = "/assets/images/card-gold-photo.webp";
+let selColourPrice = "£99";
+let selFamily      = null;        // top-level finish — starts empty; a pick is REQUIRED
+let selSub         = null;        // engraving sub-tone (Silver / Gold / Rose Gold)
+
+function familyObj(colour, label) {
+  return (FINISHES_BY_COLOUR[colour] || []).find(f => f.label === label) || null;
+}
+// Human-readable finish, e.g. "Printed", "Engraved", "Gold Engraving", "Custom Colour".
+function finishLabel() {
+  if (!selFamily) return "";
+  if (selFamily === "Engraved") return selSub ? (selSub + " Engraving") : "Engraved";
+  return selFamily;
+}
+function finishComplete() {
+  if (!selFamily) return false;
+  const fam = familyObj(selColour, selFamily);
+  if (fam && fam.options && fam.options.length && !selSub) return false; // engraving tone not chosen
+  return true;
+}
+// Combo photo filename, e.g. Black + Gold engraving -> "blackmetalgold.webp".
+// Missing files fall back to the plain colour photo via the image onerror handler.
+function comboSlug() {
+  const colour = selColour.toLowerCase().replace(/\s+/g, "");
+  let tone;
+  if (selFamily === "Engraved") tone = selSub ? selSub.toLowerCase().replace(/\s+/g, "") : "engraved";
+  else if (selFamily === "Custom Colour") tone = "custom";
+  else tone = "printed";
+  return colour + "metal" + tone;
+}
+function comboImg() {
+  if (!selFamily) return selColourImg;
+  return "/assets/images/" + comboSlug() + ".webp";
+}
+
+function renderFinishChips(colour) {
+  const wrap = document.getElementById('engraveChips');
+  const sub  = document.getElementById('engraveSub');
+  if (!wrap) return;
+  const fams = FINISHES_BY_COLOUR[colour] || [{ label: "Printed" }];
+  selFamily = null;   // nothing pre-selected — the customer must choose a finish
+  selSub = null;
+  wrap.innerHTML = "";
+  fams.forEach(function(f) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'finish-chip';
+    b.textContent = f.label;
+    b.addEventListener('click', function() { switchFamily(b, f); });
+    wrap.appendChild(b);
+  });
+  if (sub) { sub.innerHTML = ""; sub.style.display = "none"; }
+}
+
+function switchFamily(btn, fam) {
+  selFamily = fam.label;
+  document.querySelectorAll('#engraveChips .finish-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const sub = document.getElementById('engraveSub');
+  if (fam.options && fam.options.length) {
+    selSub = null;   // engraving tone must be chosen explicitly
+    sub.innerHTML = "";
+    fam.options.forEach(function(o) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'finish-chip';
+      const dot = document.createElement('span');
+      dot.className = 'finish-dot';
+      dot.style.background = TONE_COLOURS[o] || '#ccc';
+      b.appendChild(dot);
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click', function() { switchSub(b, o); });
+      sub.appendChild(b);
+    });
+    sub.style.display = "flex";
+  } else {
+    selSub = null;
+    sub.innerHTML = "";
+    sub.style.display = "none";
+  }
+  applySelection();
+}
+
+function switchSub(btn, subName) {
+  selSub = subName;
+  document.querySelectorAll('#engraveSub .finish-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applySelection();
+}
+
+function applySelection() {
+  const img = comboImg();
   const mainImg = document.getElementById('mainCardImg');
-  mainImg.style.opacity = '0';
-  setTimeout(() => { mainImg.src = imgSrc; mainImg.style.opacity = '1'; }, 150);
+  if (mainImg) {
+    mainImg.style.opacity = '0';
+    setTimeout(() => {
+      mainImg.onerror = function () { mainImg.onerror = null; mainImg.src = selColourImg; };
+      mainImg.src = img;
+      mainImg.style.opacity = '1';
+    }, 150);
+  }
+  const selF = document.getElementById('selectedFinish');    if (selF) selF.textContent = selColour;
+  const selE = document.getElementById('selectedEngraving');
+  if (selE) {
+    const fam = familyObj(selColour, selFamily);
+    if (!selFamily) selE.textContent = 'Select an option';
+    else if (fam && fam.options && fam.options.length && !selSub) selE.textContent = selFamily + ' — choose a colour';
+    else selE.textContent = finishLabel();
+  }
+  const desc = document.getElementById('finishDesc');
+  if (desc) desc.textContent = selFamily ? (FINISH_DESC[selFamily] || "") : "";
+  const dp   = document.getElementById('displayPrice');      if (dp) dp.textContent = selColourPrice;
+  // Sticky bar
+  const sImg = document.getElementById('stickyBarImg');
+  if (sImg) { sImg.onerror = function () { sImg.onerror = null; sImg.src = selColourImg; }; sImg.src = img; }
+  const sName = document.getElementById('stickyBarName');
+  if (sName) sName.textContent = (document.title.split(' ')[0]) + ' NFC card — ' + selColour;
+  const sPrice = document.querySelector('.sticky-bar-price'); if (sPrice) sPrice.textContent = selColourPrice;
+}
+
+function switchFinish(clickedThumb, imgSrc, finishName, price) {
+  selColour = finishName;
+  selColourImg = imgSrc;
+  selColourPrice = price;
   document.querySelectorAll('.ph-thumb').forEach(t => t.classList.remove('active'));
   if (clickedThumb) clickedThumb.classList.add('active');
-  document.getElementById('selectedFinish').textContent = finishName;
-  document.getElementById('displayPrice').textContent = price;
-  // Update sticky bar
-  const sImg = document.getElementById('stickyBarImg'); if (sImg) sImg.src = imgSrc;
-  const sName = document.getElementById('stickyBarName');
-  if (sName) sName.textContent = (document.title.split(' ')[0]) + ' NFC card — ' + finishName;
-  const sPrice = document.querySelector('.sticky-bar-price'); if (sPrice) sPrice.textContent = price;
+  renderFinishChips(selColour);   // resets the finish — must be re-picked per colour
+  applySelection();
 }
+
+// Populate finish options for the initial colour on load (nothing pre-selected)
+renderFinishChips(selColour);
+applySelection();
 
 // ── Sticky buy bar ──
 const stickyBar = document.getElementById('stickyBar');
