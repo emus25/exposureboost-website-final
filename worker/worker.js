@@ -21,7 +21,7 @@ const PRODUCTS = {
   wooden:  { name: "Wooden NFC Card",  amount: 7000 },
   plastic: { name: "Plastic NFC Card", amount: 7000 },
   stand:   { name: "NFC Stand",        amount: 9900 },
-  keyring: { name: "NFC Keyring (3-pack)", amount: 6000 },
+  keyring: { name: "NFC Keyring (3-pack)", amount: 12000 },
   tester:   { name: "NFC Stand",        amount: 100 },
 };
 
@@ -123,6 +123,29 @@ const TAGIFY_VARIANTS = {
   "wooden|Oak|Printed": "47245115785510",
 };
 
+// Tagify requires BOTH product_id and variant_id per line item.
+// variant_id -> parent product_id (from GET /products).
+const VARIANT_PRODUCT = {
+  "45087503876390": "8319205507366", "45087503909158": "8319205507366", "45165988380966": "8319205507366",
+  "45165988413734": "8319205507366", "45165988446502": "8319205507366", "45165988479270": "8319205507366",
+  "45165988512038": "8319205507366", "45165988544806": "8319205507366", "45165988577574": "8319205507366",
+  "45165988610342": "8319205507366", "45165988643110": "8319205507366", "45165988675878": "8319205507366",
+  "45165988708646": "8319205507366", "45165988741414": "8319205507366", "45165988774182": "8319205507366",
+  "45165988806950": "8319205507366", "45165988839718": "8319205507366", "45165988872486": "8319205507366",
+  "45944469520678": "8319205507366", "45944469553446": "8319205507366", "45944469684518": "8319205507366",
+  "45944469717286": "8319205507366",
+  "45248269943078": "8365685473574", "45248270041382": "8365685473574", "45248270139686": "8365685473574",
+  "45248270237990": "8365685473574", "47521023131942": "8365685473574",
+  "45258359734566": "8367744942374", "45258359767334": "8367744942374", "45258359800102": "8367744942374",
+  "45258359832870": "8367744942374", "45258359865638": "8367744942374", "45258359898406": "8367744942374",
+  "45258359931174": "8367744942374", "45258359963942": "8367744942374", "45258360127782": "8367744942374",
+  "45258360160550": "8367744942374", "45258360291622": "8367744942374",
+  "45288644116774": "8375582359846", "45288644149542": "8375582359846",
+  "47245115130150": "8875806064934", "47245115228454": "8875806064934", "47245115392294": "8875806064934",
+  "47245115556134": "8875806064934", "47245115785510": "8875806064934", "47245115883814": "8875806064934",
+  "47245116047654": "8875806064934",
+};
+
 function splitFinish(finish) {
   const f = finish || "";
   const i = f.indexOf(" - ");
@@ -146,7 +169,7 @@ async function forwardToTagify(env, s, md, orderRef, uploadLink) {
   const awaiting = [];
   for (const it of items) {
     const v = tagifyVariant(it);
-    if (v) lineItems.push({ variant_id: v, quantity: it.qty });
+    if (v) lineItems.push({ product_id: VARIANT_PRODUCT[v], variant_id: v, quantity: it.qty });
     else awaiting.push(describeItem(it));
   }
 
@@ -238,6 +261,16 @@ function esc(s) {
 
 function getSiteUrl(env) {
   return (env.SITE_URL || "").replace(/\/$/, "");
+}
+
+async function postSheet(env, body) {
+  const resp = await fetch(env.SHEET_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const text = await resp.text();
+  try { return JSON.parse(text); } catch (_) { return {}; }
 }
 
 function makeOrderReference(sessionId) {
@@ -403,7 +436,19 @@ async function getSession(url, env) {
     }
 
     const md = s.metadata || {};
-    const orderRef = makeOrderReference(s.id);
+
+    // The sequential invoice number is assigned by the webhook and stored in the
+    // sheet — look it up by Stripe session. May be "" for a second or two until
+    // the webhook lands; the success page polls until it appears.
+    let orderRef = "";
+    try {
+      const r = await postSheet(env, {
+        action: "getWebsiteRef",
+        token: env.SHEET_TOKEN || "",
+        session_id: s.id,
+      });
+      orderRef = r.invoice_number || "";
+    } catch (_) {}
 
     return json({
       status: "success",
@@ -434,7 +479,15 @@ async function uploadLogo(request, env) {
     const form = await request.formData();
 
     const sessionId = String(form.get("session_id") || "").trim();
-    const orderRef = String(form.get("order_reference") || makeOrderReference(sessionId)).trim();
+    let orderRef = String(form.get("order_reference") || "").trim();
+    if (!orderRef && sessionId && env.SHEET_WEBHOOK_URL) {
+      // Fall back to the authoritative number from the sheet (folder stays consistent).
+      try {
+        const r = await postSheet(env, { action: "getWebsiteRef", token: env.SHEET_TOKEN || "", session_id: sessionId });
+        orderRef = r.invoice_number || "";
+      } catch (_) {}
+    }
+    if (!orderRef) orderRef = makeOrderReference(sessionId);
     const company = String(form.get("company") || form.get("name") || "Website Customer").trim();
     const products = String(form.get("products") || "Website order").trim();
     const file = form.get("logo");
@@ -532,7 +585,6 @@ async function webhook(request, env) {
     const s = event.data.object;
     const md = s.metadata || {};
 
-    const orderRef = makeOrderReference(s.id);
     const customerName = md.customer_name || s.customer_details?.name || "";
     const customerEmail = s.customer_details?.email || s.customer_email || "";
     const phone = md.customer_phone || s.customer_details?.phone || "";
@@ -541,68 +593,84 @@ async function webhook(request, env) {
     const currency = (s.currency || "gbp").toUpperCase();
     const uploadLink = `${getSiteUrl(env)}/success.html?session_id=${encodeURIComponent(s.id)}`;
 
-    // Forward the order to NFC Tagify for production (never breaks the webhook).
-    let tagifyStatus = "";
-    try {
-      tagifyStatus = await forwardToTagify(env, s, md, orderRef, uploadLink);
-    } catch (_) {}
-
-    const row = {
-      token: env.SHEET_TOKEN || "",
-      date: new Date().toISOString(),
-      order_reference: orderRef,
-      name: customerName,
-      company: customerName,
-      email: customerEmail,
-      phone: phone,
-      products: products,
-      total: total,
-      currency: currency,
-      logo_url: "",
-      session_id: s.id || "",
-      upload_link: uploadLink,
-      tagify_status: tagifyStatus,
-    };
-
     if (env.SHEET_WEBHOOK_URL) {
+      // 1) Log the order. Apps Script assigns the sequential invoice number and
+      //    is idempotent by Stripe session, so webhook retries never double-number.
+      let invoiceNumber = "";
+      let isNew = true;
       try {
-        await fetch(env.SHEET_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(row),
+        const res = await postSheet(env, {
+          token: env.SHEET_TOKEN || "",
+          date: new Date().toISOString(),
+          name: customerName,
+          company: customerName,
+          email: customerEmail,
+          phone: phone,
+          products: products,
+          total: total,
+          currency: currency,
+          logo_url: "",
+          session_id: s.id || "",
+          upload_link: uploadLink,
         });
+        invoiceNumber = res.invoice_number || "";
+        isNew = res.is_new !== false;
       } catch (_) {}
-    }
 
-    /*
-     * Fallback email:
-     * This only works if your Apps Script has an action called:
-     * sendWebsiteOrderEmail
-     *
-     * If your Apps Script does not have that yet, this request will do nothing useful.
-     */
-    if (customerEmail) {
-      try {
-        await fetch(env.SHEET_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "sendWebsiteOrderEmail",
+      // Only run the one-time side effects on the first delivery of this order.
+      if (isNew) {
+        // 2) Forward to NFC Tagify (invoice number used for the Drive-folder match).
+        let tagifyStatus = "";
+        try {
+          tagifyStatus = await forwardToTagify(env, s, md, invoiceNumber, uploadLink);
+        } catch (_) {}
+        try {
+          await postSheet(env, {
+            action: "setTagifyStatus",
             token: env.SHEET_TOKEN || "",
-            email: customerEmail,
-            name: customerName || "there",
-            order_reference: orderRef,
-            products: products,
-            total: total,
-            currency: currency,
-            upload_link: uploadLink,
-          }),
-        });
-      } catch (_) {}
+            session_id: s.id || "",
+            tagify_status: tagifyStatus,
+          });
+        } catch (_) {}
+
+        // 3) Customer confirmation email + PDF invoice.
+        if (customerEmail) {
+          const invItems = parseCart(md.cart_raw || "").map((it) => ({
+            name: itemLabel(it) || PRODUCTS[it.id].name,
+            qty: it.qty,
+            unit: (PRODUCTS[it.id].amount / 100).toFixed(2),
+            amount: ((PRODUCTS[it.id].amount * it.qty) / 100).toFixed(2),
+          }));
+          const shipD = s.shipping_details || (s.collected_information && s.collected_information.shipping_details) || null;
+          const shipA = (shipD && shipD.address) || (s.customer_details && s.customer_details.address) || null;
+          const shippingAddress = shipA ? {
+            name: (shipD && shipD.name) || customerName || "",
+            line1: shipA.line1 || "",
+            line2: shipA.line2 || "",
+            city: shipA.city || "",
+            province: shipA.state || "",
+            zip: shipA.postal_code || "",
+            country: shipA.country || "",
+          } : null;
+
+          try {
+            await postSheet(env, {
+              action: "sendWebsiteOrderEmail",
+              token: env.SHEET_TOKEN || "",
+              email: customerEmail,
+              name: customerName || "there",
+              order_reference: invoiceNumber,
+              products: products,
+              total: total,
+              currency: currency,
+              upload_link: uploadLink,
+              line_items: invItems,
+              shipping_address: shippingAddress,
+              date: new Date().toISOString(),
+            });
+          } catch (_) {}
+        }
+      }
     }
   }
 

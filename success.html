@@ -141,21 +141,31 @@ async function loadOrder() {
     return;
   }
 
-  const res = await fetch(
-    WORKER + "/session?session_id=" + encodeURIComponent(sessionId)
-  );
+  // The invoice number is assigned by the payment webhook, which can land a
+  // second or two after this page. Poll until it appears.
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const res = await fetch(
+      WORKER + "/session?session_id=" + encodeURIComponent(sessionId)
+    );
+    sessionData = await res.json();
 
-  sessionData = await res.json();
+    if (sessionData.status !== "success") {
+      document.getElementById("orderRef").innerText = "Unable to load order";
+      return;
+    }
 
-  if (sessionData.status !== "success") {
-    document.getElementById("orderRef").innerText =
-      "Unable to load order";
-    return;
+    if (sessionData.order_reference) {
+      document.getElementById("orderRef").innerText =
+        "Order number: #" + sessionData.order_reference;
+      return;
+    }
+
+    document.getElementById("orderRef").innerText = "Confirming your order…";
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
   document.getElementById("orderRef").innerText =
-    "Order Reference: " +
-    sessionData.order_reference;
+    "Order confirmed — your number will follow by email.";
 }
 
 document
