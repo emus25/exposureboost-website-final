@@ -356,7 +356,7 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
 <!-- STICKY BUY BAR (appears after scrolling past hero) -->
 <div class="sticky-bar" id="stickyBar">
   <div class="sticky-bar-left">
-    <img src="/assets/images/card-gold-photo.webp" alt="Metal card" id="stickyBarImg">
+    <img src="/assets/images/goldmetalprinted.webp" alt="Metal card" id="stickyBarImg">
     <div>
       <p style="font-size:13px;font-weight:500;color:#fff;margin:0;white-space:nowrap;" id="stickyBarName">Metal NFC card — Gold</p>
       <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0;white-space:nowrap;">Free UK delivery</p>
@@ -428,23 +428,23 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
       <!-- LEFT: Image viewer + colour selector + add to cart -->
       <div class="ph-viewer">
         <div class="ph-main">
-          <img src="/assets/images/card-gold-photo.webp" alt="Metal NFC business card — Gold finish" id="mainCardImg">
+          <img src="/assets/images/goldmetalprinted.webp" alt="Metal NFC business card — Gold finish" id="mainCardImg">
         </div>
 
         <p class="ph-colour-sel">Colour: <span id="selectedFinish">Gold</span></p>
 
         <!-- Tap a card to change the colour & main image -->
         <div class="ph-thumbs" id="thumbGrid">
-          <div class="ph-thumb active" onclick="switchFinish(this, '/assets/images/card-gold-photo.webp', 'Gold', '£99')"><img src="/assets/images/card-gold-photo.webp" alt="Gold"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-black-photo.webp', 'Black', '£99')"><img src="/assets/images/card-black-photo.webp" alt="Black"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-silver-photo.webp', 'Silver', '£99')"><img src="/assets/images/card-silver-photo.webp" alt="Silver"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-rosegold-photo.webp', 'Rose gold', '£99')"><img src="/assets/images/card-rosegold-photo.webp" alt="Rose gold"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-white-photo.webp', 'White', '£99')"><img src="/assets/images/card-white-photo.webp" alt="White"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-green-photo.webp', 'Green', '£99')"><img src="/assets/images/card-green-photo.webp" alt="Green"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-purple-photo.webp', 'Purple', '£99')"><img src="/assets/images/card-purple-photo.webp" alt="Purple"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-blue-photo.webp', 'Blue', '£99')"><img src="/assets/images/card-blue-photo.webp" alt="Blue"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-red-photo.webp', 'Red', '£99')"><img src="/assets/images/card-red-photo.webp" alt="Red"></div>
-          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/card-custom-photo.webp', 'Custom', '£99')"><img src="/assets/images/card-custom-photo.webp" alt="Custom"></div>
+          <div class="ph-thumb active" onclick="switchFinish(this, '/assets/images/goldmetalprinted.webp', 'Gold', '£99')"><img src="/assets/images/goldmetalprinted.webp" alt="Gold"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/blackmetalgold.webp', 'Black', '£99')"><img src="/assets/images/blackmetalgold.webp" alt="Black"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/silvermetalprinted.webp', 'Silver', '£99')"><img src="/assets/images/silvermetalprinted.webp" alt="Silver"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/rosegoldmetalprinted.webp', 'Rose gold', '£99')"><img src="/assets/images/rosegoldmetalprinted.webp" alt="Rose gold"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/whitemetalgold.webp', 'White', '£99')"><img src="/assets/images/whitemetalgold.webp" alt="White"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/greenmetalprinted.webp', 'Green', '£99')"><img src="/assets/images/greenmetalprinted.webp" alt="Green"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/purplemetalgold.webp', 'Purple', '£99')"><img src="/assets/images/purplemetalgold.webp" alt="Purple"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/bluemetalprinted.webp', 'Blue', '£99')"><img src="/assets/images/bluemetalprinted.webp" alt="Blue"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/redmetalprinted.webp', 'Red', '£99')"><img src="/assets/images/redmetalprinted.webp" alt="Red"></div>
+          <div class="ph-thumb" onclick="switchFinish(this, '/assets/images/custommetalprinted.webp', 'Custom', '£99')"><img src="/assets/images/custommetalprinted.webp" alt="Custom"></div>
         </div>
 
         <!-- Engraving / logo finish (metal only). Updates the photo, name & cart line. -->
@@ -988,7 +988,7 @@ const TONE_COLOURS = {
 };
 
 let selColour      = "Gold";
-let selColourImg   = "/assets/images/card-gold-photo.webp";
+let selColourImg   = "/assets/images/goldmetalprinted.webp";
 let selColourPrice = "£99";
 let selFamily      = null;        // top-level finish — starts empty; a pick is REQUIRED
 let selSub         = null;        // engraving sub-tone (Silver / Gold / Rose Gold)
