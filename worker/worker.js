@@ -459,6 +459,10 @@ async function getSession(url, env) {
       email: s.customer_details?.email || s.customer_email || "",
       phone: md.customer_phone || s.customer_details?.phone || "",
       products: md.cart || "",
+      items: parseCart(md.cart_raw || "").map((it) => ({
+        name: itemLabel(it) || PRODUCTS[it.id].name,
+        qty: it.qty,
+      })),
       total: ((s.amount_total || 0) / 100).toFixed(2),
       currency: (s.currency || "gbp").toUpperCase(),
     });
@@ -490,6 +494,8 @@ async function uploadLogo(request, env) {
     if (!orderRef) orderRef = makeOrderReference(sessionId);
     const company = String(form.get("company") || form.get("name") || "Website Customer").trim();
     const products = String(form.get("products") || "Website order").trim();
+    const product = String(form.get("product") || "").trim();
+    const allProducts = String(form.get("all_products") || "").trim();
     const file = form.get("logo");
 
     if (!orderRef) {
@@ -514,6 +520,8 @@ async function uploadLogo(request, env) {
       action: "uploadLogo",
       inv: orderRef,
       company: company,
+      product: product,
+      all_products: allProducts,
       items: products,
       fileName: file.name || "logo",
       mimeType: file.type || "application/octet-stream",

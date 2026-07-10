@@ -101,22 +101,11 @@ button:hover{
     </div>
 
     <p>
-      Upload your logo below so we can begin production.
+      Upload a logo for each product below so we can begin production.
+      Bought several products? Upload a different logo for each one.
     </p>
 
-    <div class="upload-box">
-
-      <input type="file" id="logo" accept="image/*">
-
-      <br>
-
-      <button id="uploadBtn">
-        Upload Logo
-      </button>
-
-      <div class="status" id="status"></div>
-
-    </div>
+    <div id="uploadList"></div>
 
   </div>
 
@@ -143,6 +132,7 @@ async function loadOrder() {
 
   // The invoice number is assigned by the payment webhook, which can land a
   // second or two after this page. Poll until it appears.
+  let rendered = false;
   for (let attempt = 0; attempt < 8; attempt++) {
     const res = await fetch(
       WORKER + "/session?session_id=" + encodeURIComponent(sessionId)
@@ -154,9 +144,15 @@ async function loadOrder() {
       return;
     }
 
+    if (!rendered && sessionData.items && sessionData.items.length) {
+      renderUploads();
+      rendered = true;
+    }
+
     if (sessionData.order_reference) {
       document.getElementById("orderRef").innerText =
         "Order number: #" + sessionData.order_reference;
+      if (!rendered) { renderUploads(); rendered = true; }
       return;
     }
 
@@ -166,102 +162,97 @@ async function loadOrder() {
 
   document.getElementById("orderRef").innerText =
     "Order confirmed — your number will follow by email.";
+  if (!rendered) renderUploads();
 }
 
-document
-.getElementById("uploadBtn")
-.addEventListener("click", async () => {
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
 
-  const file =
-    document.getElementById("logo").files[0];
+function makeUploadRow(label, product, applyAll) {
+  const row = document.createElement("div");
+  row.className = "upload-box";
+  row.innerHTML =
+    "<div style='font-weight:bold;margin-bottom:10px'>" + escapeHtml(label) + "</div>" +
+    "<input type='file' accept='image/*'>" +
+    "<br><button type='button'>Upload logo</button>" +
+    "<div class='status'></div>";
+  const fileInput = row.querySelector("input[type=file]");
+  const btn = row.querySelector("button");
+  const status = row.querySelector(".status");
+  btn.addEventListener("click", function () { uploadOne(product, applyAll, fileInput, btn, status); });
+  return row;
+}
 
-  if (!file) {
-    alert("Please choose a logo file.");
+function noteLine(html, dim) {
+  const p = document.createElement("p");
+  p.style.cssText = "font-size:" + (dim ? "13px;color:rgba(255,255,255,.5)" : "14px;color:rgba(255,255,255,.8)") +
+    ";margin:16px 0 4px;line-height:1.5";
+  p.innerHTML = html;
+  return p;
+}
+
+function renderUploads() {
+  const list = document.getElementById("uploadList");
+  if (!list) return;
+  list.innerHTML = "";
+  const items = (sessionData && sessionData.items && sessionData.items.length)
+    ? sessionData.items : [{ name: "Your logo", qty: 1 }];
+
+  // One product -> one simple upload, nothing else required.
+  if (items.length <= 1) {
+    list.appendChild(makeUploadRow(items[0] ? items[0].name : "Your logo", items[0] ? items[0].name : "", ""));
     return;
   }
 
-  if (!sessionData) {
-    alert("Order information not loaded.");
-    return;
-  }
+  // Multiple products -> one "same logo for all", plus optional per-product overrides.
+  const allNames = items.map(function (i) { return i.name; }).join(" | ");
+  list.appendChild(noteLine("Using the <b>same logo</b> for everything? Just upload it once here and we'll apply it to all your products. Only if you want <b>different logos or designs per product</b> (e.g. different businesses) do you need to upload them separately below.", false));
+  list.appendChild(makeUploadRow("Same logo — used for all " + items.length + " products", "", allNames));
+  list.appendChild(noteLine("Different logo for a specific product? Upload it here (optional):", true));
+  items.forEach(function (it) {
+    list.appendChild(makeUploadRow(it.name + (it.qty > 1 ? " ×" + it.qty : ""), it.name, ""));
+  });
+}
 
-  const status =
-    document.getElementById("status");
+async function uploadOne(product, applyAll, fileInput, btn, status) {
+  const file = fileInput.files[0];
+  if (!file) { alert("Please choose a logo file."); return; }
+  if (!sessionData) { alert("Order still loading — try again in a moment."); return; }
 
-  status.innerText = "Uploading...";
+  status.style.color = "#fff";
+  status.innerText = "Uploading…";
+  btn.disabled = true;
 
   const form = new FormData();
-
-  form.append(
-    "session_id",
-    sessionData.session_id
-  );
-
-  form.append(
-    "order_reference",
-    sessionData.order_reference
-  );
-
-  form.append(
-    "name",
-    sessionData.name || ""
-  );
-
-  form.append(
-    "company",
-    sessionData.name || ""
-  );
-
-  form.append(
-    "products",
-    sessionData.products || ""
-  );
-
-  form.append(
-    "logo",
-    file
-  );
+  form.append("session_id", sessionData.session_id || "");
+  form.append("order_reference", sessionData.order_reference || "");
+  form.append("name", sessionData.name || "");
+  form.append("company", sessionData.name || "");
+  form.append("product", product || "");
+  form.append("all_products", applyAll || "");
+  form.append("products", sessionData.products || "");
+  form.append("logo", file);
 
   try {
-
-    const res = await fetch(
-      WORKER + "/upload-logo",
-      {
-        method: "POST",
-        body: form
-      }
-    );
-
+    const res = await fetch(WORKER + "/upload-logo", { method: "POST", body: form });
     const result = await res.json();
-
     if (result.status === "success") {
-
       status.style.color = "#4ade80";
-
-      status.innerText =
-        "✓ Logo uploaded successfully. Taking you back home…";
-
-      setTimeout(function () { window.location.href = "/"; }, 2000);
-
+      status.innerText = "✓ Uploaded";
+      btn.innerText = "Replace logo";
     } else {
-
       status.style.color = "#ff6b6b";
-
-      status.innerText =
-        result.message || "Upload failed.";
-
+      status.innerText = result.message || "Upload failed.";
     }
-
   } catch (err) {
-
     status.style.color = "#ff6b6b";
-
-    status.innerText =
-      "Upload failed. Please try again.";
-
+    status.innerText = "Upload failed. Please try again.";
   }
-
-});
+  btn.disabled = false;
+}
 
 loadOrder();
 

@@ -4,6 +4,12 @@ Everything needed to continue in a new chat. Static HTML/CSS/JS site + Cloudflar
 (checkout) + Google Apps Script (Sheet/Drive/email) + NFC Tagify (production/fulfilment).
 Two order channels: **website** and **in-person** (`orderform.exposureboost.co.uk`).
 
+> **STATUS: DEPLOYED & LIVE.** Website + Worker + Apps Script all deployed and tested working
+> (sequential #numbers, PDF invoices, Drive folders, Tagify forwarding). Counter reset to #10130.
+> **Only blocker:** NFC Tagify has authorised **keyrings only** — all other products forward but get
+> rejected/held until the seller authorises the rest of the variants (see TODO 1). Those are fulfilled
+> manually meanwhile (flagged in the Tagify Status column).
+
 ---
 
 ## 1. The pieces & where they live
@@ -59,6 +65,12 @@ website folder freely; the Worker file has no secrets (reads them from Cloudflar
 - **Collection vs Shipping**: in-person note says `SHIPPING to customer` or
   `COLLECTION — ExposureBoost collects from your office (do NOT ship)`. Collection = **Ediz collects from
   Tagify's office**; it forwards even without a full address.
+- **Logo upload (website success page)**: now saves each logo **into the product subfolder** (was top-level).
+  Success page shows an upload slot **per product** (from `/session` `items`). One product = one simple box.
+  Multiple products = a **"same logo — used for all N products"** box (sends `all_products="A | B | C"` → Apps
+  Script drops the logo into every product subfolder) **plus optional per-product slots** (`product="Name"` →
+  that one subfolder). Nothing is required beyond one upload. Touches `success.html`, Worker `/upload-logo`
+  (passes `product`/`all_products`) + `getSession` (returns `items`), and Apps Script `handleLogoUpload`.
 - **Photos**: `assets/images/` is now ONE flat set. Base/default swatch = `<colour>metalprinted.webp` (etc.);
   combos `<colour>metal<tone>.webp` (tone: printed/silver/gold/rosegold/engraved); wood `wood-<type>-photo.webp`,
   plastic `plastic-<colour>-photo.webp`. `card-*-photo.webp` naming was **removed** and the metal page repointed
@@ -84,9 +96,11 @@ website folder freely; the Worker file has no secrets (reads them from Cloudflar
 
 ## 5. OUTSTANDING / TODO (next chat)
 
-1. **Seller must authorise the ~47 Tagify variant IDs** to the partner account, or orders 500 with
-   "Partner is not authorized to order this product variant." Keyring already authorised (product `8375582359846`,
-   variant `45288644116774`, SKU CSTM156). Full variant list is in `worker.js` `TAGIFY_VARIANTS` / `VARIANT_PRODUCT`.
+1. **Seller must authorise the remaining Tagify variant IDs** to the partner account. **Keyrings are
+   authorised and CONFIRMED WORKING** (product `8375582359846`, variant `45288644116774`, SKU CSTM156).
+   All OTHER products currently forward but get rejected ("Partner is not authorized to order this product
+   variant") → fulfilled manually until authorised. Full list is in `worker.js` `TAGIFY_VARIANTS` /
+   `VARIANT_PRODUCT` (send the seller those IDs). This is the last thing blocking full auto-fulfilment.
 2. **Tagify mapping gaps** (currently "awaiting integration — fulfil manually"): metal **printed** in
    Green/Purple/Blue/Red; metal **engraved** on brushed Gold/Silver/Rose gold; metal **Custom**; **wood engraved**
    (Tagify has no engraved-wood product); **stands / table talkers** (no Tagify product). Seller to add/authorise, then extend the maps.
@@ -95,9 +109,16 @@ website folder freely; the Worker file has no secrets (reads them from Cloudflar
 4. **Tracking feature — planned, NOT built.** No Tagify webhooks → poll `GET /orders/{id}` or
    `/orders/{id}/tracking` ~twice daily; when `status:shipped` + `tracking.url` (AfterShip), email the customer,
    mark notified. Recommended home: Apps Script time trigger. Needs saving the Tagify order `id`.
-5. **Spreadsheet consolidation** — bring old "sales from november 2025" history into the live sheet as a
-   **History** tab, build a formula **Master/All Revenue** roll-up (QUERY) of History + both order tabs. Then a
-   **dashboard** (Looker Studio recommended for the Geckoboard look, or in-Sheets).
+5. **Dashboard / accounting** — IN PROGRESS. Ediz wants **4 tabs only**: Dashboard, Website Orders,
+   In Person Orders, Expenses (no History/Master tabs — history not being migrated for now). The **Dashboard**
+   is read-only formulas over the other tabs (never writes — zero Apps Script risk). Given: headline totals
+   (SUMPRODUCT(IFERROR(VALUE(range),0)) pattern to survive text-stored numbers) — Website rev = 'Website Orders'!H,
+   In-person rev = 'In Person Orders'!I, expenses = Expenses!D (confirm), orders via COUNTA of col B; plus a
+   bottom **rolling all-orders list** via stacked QUERY of the two order tabs (cols Date/Invoice #/Source/
+   Customer/Item(s)/Revenue). **Two gaps to enable YTD/monthly + true profit:** (a) store **real dates** (Apps
+   Script writes mixed text now — small safe change), (b) add **website supplier cost/profit** (in-person has
+   cols T/U; website has none — costs known: metal £30–37, wood £13.85, plastic £12.82, keyring £12.82).
+   Offered both to Ediz. Waiting on: Expenses tab column layout + confirm order tabs unchanged.
 6. **In-person order form rebuild** (Ediz wants to redo it with Claude separately).
 7. **Oak** photo missing (`wood-oak-photo.webp`).
 8. Consider whether **Collection** should ship to a fixed Ediz address vs the entered address (currently the latter, with a COLLECTION note).
