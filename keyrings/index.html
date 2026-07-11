@@ -150,6 +150,23 @@ body { font-family: system-ui, -apple-system, sans-serif; font-size: 16px; line-
 .finish-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
 .finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
+/* Profile-type selector (shared vs separate profiles) */
+.profile-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+.profile-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.profile-option {
+  background: var(--dsf); border: 1.5px solid var(--dbr);
+  border-radius: 10px; padding: 13px 15px;
+  cursor: pointer; transition: all 0.15s;
+}
+.profile-option:hover { border-color: rgba(212,168,67,0.4); }
+.profile-option.active { border-color: var(--gold); background: rgba(212,168,67,0.07); }
+.profile-option-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.profile-option-name { font-family: var(--fd); font-size: 14.5px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+.profile-option.active .profile-option-name { color: var(--gold); }
+.profile-badge { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--dbg); background: var(--gold); padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+.profile-option-price { font-family: var(--fd); font-size: 15.5px; font-weight: 700; color: #fff; white-space: nowrap; }
+.profile-option-desc { font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
 /* Divider */
 .ph-divider { border: none; border-top: 0.5px solid var(--dbr); margin: 22px 0; }
 
@@ -358,7 +375,7 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:14px;">
-    <span class="sticky-bar-price">£120</span>
+    <span class="sticky-bar-price">£99</span>
     <a href="#" class="gbtn" style="padding:10px 22px;font-size:14px;white-space:nowrap;" onclick="addToCart();return false;">Order now</a>
   </div>
 </div>
@@ -426,12 +443,46 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
           <img src="/keyringimages/keyrings.webp" alt="ExposureBoost NFC keyrings — pack of 3" id="mainCardImg">
         </div>
 
+        <p class="profile-label">Profile setup: <span id="packSubtitle" style="color:var(--gold);font-weight:600;">3 keyrings, 1 shared profile</span></p>
+        <div class="profile-options" id="profileOptions">
+          <div class="profile-option active" data-id="keyring" data-price="99" data-sub="3 keyrings, 1 shared profile">
+            <div class="profile-option-top">
+              <span class="profile-option-name">Shared profile <span class="profile-badge">Most popular</span></span>
+              <span class="profile-option-price">£99</span>
+            </div>
+            <p class="profile-option-desc">All 3 keyrings tap to the <b>same page</b> — your company info, links and reviews, all in one place. The simple choice if you just want one profile for the business.</p>
+          </div>
+          <div class="profile-option" data-id="keyring3" data-price="160" data-sub="3 keyrings, 3 separate profiles">
+            <div class="profile-option-top">
+              <span class="profile-option-name">Separate profiles</span>
+              <span class="profile-option-price">£160</span>
+            </div>
+            <p class="profile-option-desc">Each keyring gets its <b>own page</b> — for when you want each team member to have their own contact details, without buying them a full card each.</p>
+          </div>
+        </div>
+        <script>
+          (function(){
+            var opts = document.querySelectorAll('#profileOptions .profile-option');
+            window.selectedProfileId = 'keyring';
+            opts.forEach(function(o){ o.addEventListener('click', function(){
+              opts.forEach(function(x){ x.classList.remove('active'); });
+              o.classList.add('active');
+              window.selectedProfileId = o.getAttribute('data-id');
+              var price = '£' + o.getAttribute('data-price');
+              var sub = o.getAttribute('data-sub');
+              var priceEl = document.getElementById('displayPrice'); if (priceEl) priceEl.textContent = price;
+              var subEl = document.getElementById('packSubtitle'); if (subEl) subEl.textContent = sub;
+              var stickyPrice = document.querySelector('.sticky-bar-price'); if (stickyPrice) stickyPrice.textContent = price;
+            }); });
+          })();
+        </script>
+
         <p class="ph-colour-sel">Style: <span id="selectedFinish">Regular</span></p>
         <div class="finish-chips" id="finishChips">
           <div class="finish-chip active" data-finish="Regular">Regular</div>
           <div class="finish-chip" data-finish="Slanted">Slanted</div>
         </div>
-        <p style="font-size:12.5px;color:rgba(255,255,255,0.45);margin:-12px 0 20px;">Sold as a pack of 3 &mdash; mix &amp; match.</p>
+        <p style="font-size:12.5px;color:rgba(255,255,255,0.45);margin:-12px 0 20px;">Mix &amp; match styles across your pack of 3 if you like.</p>
         <script>
           (function(){
             var chips = document.querySelectorAll('#finishChips .finish-chip');
@@ -445,7 +496,7 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
 
         <!-- Compact buy row -->
         <div class="ph-buy">
-          <div class="ph-buy-price"><span id="displayPrice">£120</span><small>pack of 3 · free UK delivery</small></div>
+          <div class="ph-buy-price"><span id="displayPrice">£99</span><small>pack of 3 · free UK delivery</small></div>
           <button class="ph-add" id="addBtn" onclick="addToCart()">Add to cart</button>
         </div>
         <a class="ph-vb" id="viewBasket" href="#">View basket &amp; checkout →</a>
@@ -459,14 +510,14 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
           <span class="ph-stars">★★★★★</span>
           <span>4.9 · 127 reviews</span>
         </div>
-        <p class="ph-tagline">Your details on your keys. Tap it to any phone to share contact, socials and reviews — wherever you go.</p>
+        <p class="ph-tagline">Your details on your keys. Choose one shared profile for the whole business, or a separate page for each person — tap it to any phone to share instantly.</p>
 
         <hr class="ph-divider">
 
         <!-- What's included -->
         <ul class="ph-includes">
           <li><i class="ti ti-check"></i>Custom printed to your logo and branding</li>
-          <li><i class="ti ti-check"></i>Digital profile — website, socials, contact, reviews</li>
+          <li><i class="ti ti-check"></i>Digital profile — shared across all 3, or separate per keyring</li>
           <li><i class="ti ti-check"></i>Free profile updates forever, change anytime</li>
           <li><i class="ti ti-check"></i>QR code backup printed on the reverse</li>
           <li><i class="ti ti-check"></i>Free UK delivery in protective sleeve</li>
@@ -577,7 +628,7 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
 <section id="wyg-section" style="background:var(--dbg);padding:68px 48px;border-top:0.5px solid var(--dbr);" class="sec-pad">
   <div class="mw">
     <p class="ey-dk">Everything included</p>
-    <h2 class="sec-h sec-h-dk">What you're getting for £120.</h2>
+    <h2 class="sec-h sec-h-dk">What's included, either way.</h2>
     <div class="wyg-grid">
       <div class="wyg-item">
         <div class="wyg-icon"><i class="ti ti-key" aria-hidden="true"></i></div>
@@ -703,6 +754,10 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
       </div>
       <div>
         <details>
+          <summary>What's the difference between the £99 and £160 options?</summary>
+          <p class="faq-answer">The £99 option links all 3 keyrings to the <b>same digital profile</b> — one shared page for your company, so everyone on the team taps to the same info, links and reviews. It's the simplest setup and what most businesses choose. The £160 option gives each of the 3 keyrings its <b>own separate profile</b>, so each person can have their own contact details, job title and links — useful if you want your team to have individual pages without buying each of them a full NFC card. If you're not sure, the shared profile is the one to go for.</p>
+        </details>
+        <details>
           <summary>Will it work on my clients' iPhones?</summary>
           <p class="faq-answer">Yes, absolutely. All iPhones from iPhone 7 onwards (iOS 13+) read NFC natively — no app needed. They just tap their phone on the keyring and your profile opens in Safari instantly. Android phones work the same way from Android 5.0+, which covers virtually every phone made since 2015.</p>
         </details>
@@ -736,7 +791,7 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
   <div class="mw" style="text-align:center;">
     <p class="ey-dk" style="color:rgba(255,255,255,0.55);margin-bottom:12px;">Ready to make your mark?</p>
     <h2 class="fd" style="font-size:34px;font-weight:700;margin-bottom:12px;">Order today. In your hand within the week.</h2>
-    <p style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:30px;">From £120 · Free UK delivery</p>
+    <p style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:30px;">From £99 · Free UK delivery</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <a href="#" class="gbtn gbtn-lg" onclick="addToCart();return false;">Order your keyring</a>
       <a href="https://wa.me/447754888841" style="background:transparent;border:1.5px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);font-size:15px;font-weight:500;padding:15px 24px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
@@ -815,7 +870,8 @@ const CATALOG = {
   wooden:  { name: "Wooden NFC Card",  price: 70, thumb: "linear-gradient(150deg,#9c6a37,#5e3c1d)" },
   plastic: { name: "Plastic NFC Card", price: 70, thumb: "linear-gradient(155deg,#f7c948,#e0991a)" },
   stand:   { name: "NFC Stand", price: 99, thumb: "linear-gradient(160deg,#241845,#3a2a66)" },
-  keyring: { name: "NFC Keyring (3-pack)", price: 120, thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
+  keyring:  { name: "NFC Keyring (3-pack) — Shared Profile",    price: 99,  thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
+  keyring3: { name: "NFC Keyring (3-pack) — Separate Profiles", price: 160, thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
 };
 const CART_KEY = "eb_cart";
 const $ = id => document.getElementById(id);
@@ -905,7 +961,7 @@ function currentImg() {
   return el ? el.getAttribute('src') : "";
 }
 function addToCart() {
-  const id = document.body.getAttribute('data-product') || 'metal';
+  const id = window.selectedProfileId || document.body.getAttribute('data-product') || 'metal';
   cartAdd(id, currentFinish(), currentImg());
   const btn = $("addBtn");
   if (btn) {

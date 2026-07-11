@@ -4,11 +4,15 @@ Everything needed to continue in a new chat. Static HTML/CSS/JS site + Cloudflar
 (checkout) + Google Apps Script (Sheet/Drive/email) + NFC Tagify (production/fulfilment).
 Two order channels: **website** and **in-person** (`orderform.exposureboost.co.uk`).
 
-> **STATUS: DEPLOYED & LIVE.** Website + Worker + Apps Script all deployed and tested working
-> (sequential #numbers, PDF invoices, Drive folders, Tagify forwarding). Counter reset to #10130.
-> **Only blocker:** NFC Tagify has authorised **keyrings only** — all other products forward but get
-> rejected/held until the seller authorises the rest of the variants (see TODO 1). Those are fulfilled
-> manually meanwhile (flagged in the Tagify Status column).
+> **STATUS: LIVE, but a re-deploy is PENDING.** The core (sequential #numbers, PDF invoices, Drive folders,
+> Tagify forwarding) is deployed and tested working; counter reset to #10130.
+> **⚠️ NOT yet re-deployed:** the **multi-logo upload** feature (logo now saves *inside* each product
+> subfolder; success page has a "same logo for all" box + optional per-product slots). It changed
+> **`success.html`, `worker/worker.js`, and `Code.gs`** — all three must be re-deployed (GitHub + Cloudflare +
+> Apps Script New version). Until then the old single-logo upload is live.
+> **Tagify blocker:** NFC Tagify has authorised **keyrings only** — all other products forward but are
+> rejected/held until the seller authorises the rest of the variants (TODO 1); fulfilled manually meanwhile
+> (flagged in the Tagify Status column).
 
 ---
 
