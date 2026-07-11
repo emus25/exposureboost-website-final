@@ -6,8 +6,13 @@
 <title>Order Complete — ExposureBoost</title>
 
 <style>
+html{
+  background:#0d0720;
+}
+
 body{
   margin:0;
+  min-height:100vh;
   font-family:Arial,sans-serif;
   background:#0d0720;
   color:#fff;
@@ -50,11 +55,38 @@ p{
   border:2px dashed rgba(255,255,255,.2);
   border-radius:12px;
   text-align:center;
+  transition:border-color .15s ease, background .15s ease;
+}
+
+.upload-box.drag-over{
+  border-color:#f0b429;
+  background:rgba(240,180,41,.06);
+}
+
+.hint{
+  margin:2px 0 14px;
+  font-size:12px;
+  color:rgba(255,255,255,.4);
 }
 
 input[type=file]{
-  margin:20px 0;
-  color:#fff;
+  display:none;
+}
+
+.file-name{
+  margin:10px 0;
+  font-size:13px;
+  color:rgba(255,255,255,.6);
+  min-height:16px;
+}
+
+.preview-img{
+  display:none;
+  max-width:100%;
+  max-height:140px;
+  border-radius:8px;
+  margin:14px 0;
+  border:1px solid rgba(255,255,255,.15);
 }
 
 button{
@@ -77,8 +109,38 @@ button:hover{
   font-weight:bold;
 }
 
+.progress-track{
+  margin-top:16px;
+  height:8px;
+  border-radius:6px;
+  background:rgba(255,255,255,.1);
+  overflow:hidden;
+  display:none;
+}
+
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:#f0b429;
+  border-radius:6px;
+  transition:width .15s ease;
+}
+
 .hidden{
   display:none;
+}
+
+.next-steps{
+  margin-top:30px;
+  padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.1);
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(255,255,255,.6);
+}
+
+.next-steps a{
+  color:#f0b429;
 }
 </style>
 </head>
@@ -106,6 +168,12 @@ button:hover{
     </p>
 
     <div id="uploadList"></div>
+
+    <div class="next-steps">
+      <b>What happens next:</b> once we have your logo, we'll get your order into production.
+      If anything looks off with your upload or you need to send a replacement later, just email
+      <a href="mailto:ediz@exposureboost.com">ediz@exposureboost.com</a> with your order number.
+    </div>
 
   </div>
 
@@ -171,18 +239,66 @@ function escapeHtml(s) {
   });
 }
 
+const MAX_LOGO_MB = 8; // must match MAX_LOGO_BYTES in worker/worker.js
+
 function makeUploadRow(label, product, applyAll) {
   const row = document.createElement("div");
   row.className = "upload-box";
   row.innerHTML =
     "<div style='font-weight:bold;margin-bottom:10px'>" + escapeHtml(label) + "</div>" +
+    "<div class='hint'>PNG, JPG or SVG · up to " + MAX_LOGO_MB + "MB · drag and drop or click below</div>" +
     "<input type='file' accept='image/*'>" +
-    "<br><button type='button'>Upload logo</button>" +
+    "<img class='preview-img'>" +
+    "<div class='file-name'></div>" +
+    "<button type='button'>Upload logo</button>" +
+    "<div class='progress-track'><div class='progress-fill'></div></div>" +
     "<div class='status'></div>";
   const fileInput = row.querySelector("input[type=file]");
+  const previewImg = row.querySelector(".preview-img");
+  const fileName = row.querySelector(".file-name");
   const btn = row.querySelector("button");
   const status = row.querySelector(".status");
-  btn.addEventListener("click", function () { uploadOne(product, applyAll, fileInput, btn, status); });
+  const progressTrack = row.querySelector(".progress-track");
+  const progressFill = row.querySelector(".progress-fill");
+
+  function handleFile(file) {
+    if (!file) return;
+
+    if (!/^image\//.test(file.type)) {
+      status.style.color = "#ff6b6b";
+      status.innerText = "That's not an image file — please choose a PNG, JPG or SVG.";
+      return;
+    }
+    if (file.size > MAX_LOGO_MB * 1024 * 1024) {
+      status.style.color = "#ff6b6b";
+      status.innerText = "That file is over " + MAX_LOGO_MB + "MB — please choose a smaller one.";
+      return;
+    }
+
+    fileName.innerText = file.name;
+    previewImg.src = URL.createObjectURL(file);
+    previewImg.style.display = "inline-block";
+    status.style.color = "#fff";
+    status.innerText = "";
+    uploadOne(product, applyAll, file, btn, status, progressTrack, progressFill);
+  }
+
+  btn.addEventListener("click", function () { fileInput.click(); });
+  fileInput.addEventListener("change", function () { handleFile(fileInput.files[0]); });
+
+  row.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    row.classList.add("drag-over");
+  });
+  row.addEventListener("dragleave", function () { row.classList.remove("drag-over"); });
+  row.addEventListener("drop", function (e) {
+    e.preventDefault();
+    row.classList.remove("drag-over");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
   return row;
 }
 
@@ -217,14 +333,15 @@ function renderUploads() {
   });
 }
 
-async function uploadOne(product, applyAll, fileInput, btn, status) {
-  const file = fileInput.files[0];
+function uploadOne(product, applyAll, file, btn, status, progressTrack, progressFill) {
   if (!file) { alert("Please choose a logo file."); return; }
   if (!sessionData) { alert("Order still loading — try again in a moment."); return; }
 
   status.style.color = "#fff";
   status.innerText = "Uploading…";
   btn.disabled = true;
+  progressFill.style.width = "0%";
+  progressTrack.style.display = "block";
 
   const form = new FormData();
   form.append("session_id", sessionData.session_id || "");
@@ -236,22 +353,44 @@ async function uploadOne(product, applyAll, fileInput, btn, status) {
   form.append("products", sessionData.products || "");
   form.append("logo", file);
 
-  try {
-    const res = await fetch(WORKER + "/upload-logo", { method: "POST", body: form });
-    const result = await res.json();
-    if (result.status === "success") {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", WORKER + "/upload-logo");
+
+  xhr.upload.addEventListener("progress", function (e) {
+    if (!e.lengthComputable) return;
+    // Cap at 92% while the file is still in flight — the remaining stretch
+    // covers the server's processing/forwarding time before a reply lands,
+    // so the bar keeps the customer's attention instead of stalling at 100%.
+    const pct = Math.min(92, Math.round((e.loaded / e.total) * 100));
+    progressFill.style.width = pct + "%";
+  });
+
+  xhr.addEventListener("load", function () {
+    btn.disabled = false;
+    let result = {};
+    try { result = JSON.parse(xhr.responseText); } catch (err) {}
+
+    if (xhr.status >= 200 && xhr.status < 300 && result.status === "success") {
+      progressFill.style.width = "100%";
       status.style.color = "#4ade80";
       status.innerText = "✓ Uploaded";
       btn.innerText = "Replace logo";
+      setTimeout(function () { progressTrack.style.display = "none"; }, 600);
     } else {
+      progressTrack.style.display = "none";
       status.style.color = "#ff6b6b";
       status.innerText = result.message || "Upload failed.";
     }
-  } catch (err) {
+  });
+
+  xhr.addEventListener("error", function () {
+    btn.disabled = false;
+    progressTrack.style.display = "none";
     status.style.color = "#ff6b6b";
     status.innerText = "Upload failed. Please try again.";
-  }
-  btn.disabled = false;
+  });
+
+  xhr.send(form);
 }
 
 loadOrder();
