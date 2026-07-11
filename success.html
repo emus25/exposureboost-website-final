@@ -92,8 +92,8 @@ input[type=file]{
 button{
   background:#f0b429;
   color:#000;
-  border:none;
-  padding:14px 28px;
+  border:2px solid #f0b429;
+  padding:12px 28px;
   border-radius:10px;
   font-size:16px;
   font-weight:bold;
@@ -102,6 +102,13 @@ button{
 
 button:hover{
   opacity:.9;
+}
+
+/* Nothing staged yet — ghost outline, signals "pick a file" rather than "go" */
+button.btn-choose{
+  background:transparent;
+  border:2px dashed #f0b429;
+  color:#f0b429;
 }
 
 .status{
@@ -250,7 +257,7 @@ function makeUploadRow(label, product, applyAll) {
     "<input type='file' accept='image/*'>" +
     "<img class='preview-img'>" +
     "<div class='file-name'></div>" +
-    "<button type='button'>Upload logo</button>" +
+    "<button type='button' class='btn-choose'>Upload logo</button>" +
     "<div class='progress-track'><div class='progress-fill'></div></div>" +
     "<div class='status'></div>";
   const fileInput = row.querySelector("input[type=file]");
@@ -260,6 +267,8 @@ function makeUploadRow(label, product, applyAll) {
   const status = row.querySelector(".status");
   const progressTrack = row.querySelector(".progress-track");
   const progressFill = row.querySelector(".progress-fill");
+
+  let pendingFile = null;
 
   function handleFile(file) {
     if (!file) return;
@@ -275,15 +284,27 @@ function makeUploadRow(label, product, applyAll) {
       return;
     }
 
-    fileName.innerText = file.name;
+    // Stage the file and wait for an explicit click on the button before
+    // uploading — picking a file should never submit it on its own, so
+    // there's always a chance to swap it for the right one first.
+    pendingFile = file;
+    fileName.innerText = file.name + " — ready to upload";
     previewImg.src = URL.createObjectURL(file);
     previewImg.style.display = "inline-block";
     status.style.color = "#fff";
     status.innerText = "";
-    uploadOne(product, applyAll, file, btn, status, progressTrack, progressFill);
+    btn.classList.remove("btn-choose");
   }
 
-  btn.addEventListener("click", function () { fileInput.click(); });
+  btn.addEventListener("click", function () {
+    if (pendingFile) {
+      const fileToUpload = pendingFile;
+      pendingFile = null;
+      uploadOne(product, applyAll, fileToUpload, btn, status, progressTrack, progressFill);
+    } else {
+      fileInput.click();
+    }
+  });
   fileInput.addEventListener("change", function () { handleFile(fileInput.files[0]); });
 
   row.addEventListener("dragover", function (e) {
