@@ -605,6 +605,21 @@ async function webhook(request, env) {
     const currency = (s.currency || "gbp").toUpperCase();
     const uploadLink = `${getSiteUrl(env)}/success.html?session_id=${encodeURIComponent(s.id)}`;
 
+    // Exact Stripe fee for the accounts sheet. If this lookup fails, Apps
+    // Script falls back to a 1.5% + 20p estimate — never blocks the order.
+    let stripeFee = "";
+    try {
+      if (s.payment_intent && env.STRIPE_SECRET_KEY) {
+        const piResp = await fetch(
+          `https://api.stripe.com/v1/payment_intents/${encodeURIComponent(s.payment_intent)}?expand[]=latest_charge.balance_transaction`,
+          { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
+        );
+        const pi = await piResp.json();
+        const bt = pi && pi.latest_charge && pi.latest_charge.balance_transaction;
+        if (bt && typeof bt.fee === "number") stripeFee = (bt.fee / 100).toFixed(2);
+      }
+    } catch (_) {}
+
     if (env.SHEET_WEBHOOK_URL) {
       // 1) Log the order. Apps Script assigns the sequential invoice number and
       //    is idempotent by Stripe session, so webhook retries never double-number.
@@ -621,6 +636,8 @@ async function webhook(request, env) {
           products: products,
           total: total,
           currency: currency,
+          stripe_fee: stripeFee,
+          cart_raw: md.cart_raw || "",
           logo_url: "",
           session_id: s.id || "",
           upload_link: uploadLink,

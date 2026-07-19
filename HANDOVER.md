@@ -23,6 +23,7 @@ Two order channels: **website** and **in-person** (`orderform.exposureboost.co.u
 | **Website** (all pages, `assets/images/`) | GitHub `emus25/exposureboost-website-final` → GitHub Pages | Upload files to GitHub (~1 min to live at exposureboost.co.uk) |
 | **Checkout Worker** | `worker/worker.js` → Cloudflare Worker `exposureboost-checkout…workers.dev` | Paste whole file into Cloudflare → Deploy |
 | **Apps Script** | **`~/Desktop/exposureboost-appscript/Code.gs`** (moved OUT of repo on purpose) | Paste into script.google.com → Manage deployments → **New version** |
+| **In-person order form** (`orderform.exposureboost.co.uk`: `index.html`, `upload.html`) | Only exists locally as `~/Downloads/orderform-main.zip` (no checked-out repo) — GitHub Pages, custom domain via its `CNAME` | Unzip, edit, re-upload to its GitHub repo |
 | **NFC Tagify** (partner/supplier) | API base `https://id.nfctagify.com/api/shopify` | Seller-side; we call it |
 
 ⚠️ **`Code.gs` must NEVER be uploaded to GitHub** — it contains `SHEET_TOKEN`. It lives at
@@ -123,7 +124,16 @@ website folder freely; the Worker file has no secrets (reads them from Cloudflar
    Script writes mixed text now — small safe change), (b) add **website supplier cost/profit** (in-person has
    cols T/U; website has none — costs known: metal £30–37, wood £13.85, plastic £12.82, keyring £12.82).
    Offered both to Ediz. Waiting on: Expenses tab column layout + confirm order tabs unchanged.
-6. **In-person order form rebuild** (Ediz wants to redo it with Claude separately).
+6. ~~In-person order form rebuild~~ — **DONE** (rebuilt; matches the `~/Downloads/orderform-main.zip` /
+   `orderform.exposureboost.co.uk` version referenced in §1). Optional, non-priority follow-up: Ediz may
+   later re-colour it to match the main site's palette.
+   - **PENDING REDEPLOY (fixed 2026-07-16):** in-person orders had stopped creating a product subfolder
+     in Drive — `handleLogoUpload` (Code.gs) only makes a subfolder when the request carries `product`/
+     `all_products`, but `upload.html` never sent either (a gap left by the website's multi-logo/subfolder
+     work). Fix: `processOrder` now appends `&all=<pipe-separated product names>` to the upload link, and
+     `upload.html` forwards it as `all_products`. **Needs**: Apps Script new version + re-upload `upload.html`
+     to the orderform repo (see §1). Until redeployed, in-person logos still land at the top-level customer
+     folder with no product subfolder.
 7. **Oak** photo missing (`wood-oak-photo.webp`).
 8. Consider whether **Collection** should ship to a fixed Ediz address vs the entered address (currently the latter, with a COLLECTION note).
 

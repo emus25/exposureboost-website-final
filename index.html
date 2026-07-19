@@ -971,6 +971,7 @@
   </div>
 </aside>
 
+<script src="/assets/catalog.js"></script>
 <script>
 /* ---- original hero animation (unchanged) ---- */
 (function(){
@@ -1084,15 +1085,8 @@
         the product pages, the shop and checkout) ---- */
 (function(){
   var ORDER_FORM_URL = "https://exposureboost-checkout.exposureboost.workers.dev";
-  // Prices enforced in the Worker — keep in sync with worker/worker.js.
-  var CATALOG = {
-    metal:   { name:"Metal NFC Card",   price:99, thumb:"linear-gradient(150deg,#e8eaed,#9498a0)" },
-    wooden:  { name:"Wooden NFC Card",  price:70, thumb:"linear-gradient(150deg,#9c6a37,#5e3c1d)" },
-    plastic: { name:"Plastic NFC Card", price:70, thumb:"linear-gradient(155deg,#f7c948,#e0991a)" },
-    stand:   { name:"NFC Stand", price: 99, thumb:"linear-gradient(160deg,#241845,#3a2a66)" },
-    keyring:  { name:"NFC Keyring (3-pack) — Shared Profile",    price: 99,  thumb:"linear-gradient(160deg,#3a2a66,#241845)" },
-    keyring3: { name:"NFC Keyring (3-pack) — Separate Profiles", price: 160, thumb:"linear-gradient(160deg,#3a2a66,#241845)" }
-  };
+  // CATALOG itself lives in /assets/catalog.js, shared by every page — keep it
+  // in sync with worker/worker.js (PRODUCTS), which enforces prices server-side.
   var KEY = "eb_cart";
   var cart = [];
   try { cart = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch(e){}

@@ -676,72 +676,6 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section style="background:var(--lsf);padding:68px 48px;border-top:0.5px solid var(--lbr);" class="sec-pad">
-  <div class="mw">
-    <p class="ey-lt">Real customers</p>
-    <h2 class="sec-h sec-h-lt">Small thing, big impression.</h2>
-    <div class="testimonial-grid">
-      <div class="t-card">
-        <div class="t-video">
-          <!-- Replace src with real video embed when available -->
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-            <div class="t-play"><i class="ti ti-player-play"></i></div>
-            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
-          </div>
-        </div>
-        <div class="t-body">
-          <p class="t-quote">"People at chapter ask about it every single week. Four members have ordered since seeing mine."</p>
-          <div class="t-person">
-            <div class="t-av">DM</div>
-            <div>
-              <p class="t-name">David Mitchell</p>
-              <p class="t-role">Chartered accountant · BNI Altrincham</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <div class="t-video">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-            <div class="t-play"><i class="ti ti-player-play"></i></div>
-            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
-          </div>
-        </div>
-        <div class="t-body">
-          <p class="t-quote">"People always notice it on my keys and ask about it. Easiest conversation starter I've had."</p>
-          <div class="t-person">
-            <div class="t-av">ET</div>
-            <div>
-              <p class="t-name">Emma Thorpe</p>
-              <p class="t-role">Solicitor · BNI Manchester North</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <div class="t-video">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-            <div class="t-play"><i class="ti ti-player-play"></i></div>
-            <p style="font-size:12px;color:rgba(255,255,255,0.45);">Video testimonial</p>
-          </div>
-        </div>
-        <div class="t-body">
-          <p class="t-quote">"Worth every penny. I share my details anywhere now — no wallet, no fumbling. Never looked back."</p>
-          <div class="t-person">
-            <div class="t-av">RB</div>
-            <div>
-              <p class="t-name">Rob Barnes</p>
-              <p class="t-role">Mortgage broker · BNI Leeds West</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <p class="swipe-hint">← swipe to see more →</p>
-  </div>
-</section>
-
 <!-- FAQ -->
 <section style="background:var(--lbg);padding:68px 48px;border-top:0.5px solid var(--lbr);" class="sec-pad">
   <div class="mw">
@@ -857,22 +791,15 @@ footer .socials a { width: 44px; height: 44px; border-radius: 11px; border: 1px 
   </div>
 </footer>
 
+<script src="/assets/catalog.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════
 //  SHARED CART  — same localStorage key ("eb_cart"), catalog and
 //  checkout as the homepage, so the basket follows the visitor across
 //  every page (home, product pages, shop) and into checkout.
+//  CATALOG itself lives in /assets/catalog.js, shared by every page.
 // ════════════════════════════════════════════════════════════
 const ORDER_FORM_URL = "https://exposureboost-checkout.exposureboost.workers.dev";
-// Prices are enforced in the Worker — keep these in sync with worker/worker.js.
-const CATALOG = {
-  metal:   { name: "Metal NFC Card",   price: 99, thumb: "linear-gradient(150deg,#e8eaed,#9498a0)" },
-  wooden:  { name: "Wooden NFC Card",  price: 70, thumb: "linear-gradient(150deg,#9c6a37,#5e3c1d)" },
-  plastic: { name: "Plastic NFC Card", price: 70, thumb: "linear-gradient(155deg,#f7c948,#e0991a)" },
-  stand:   { name: "NFC Stand", price: 99, thumb: "linear-gradient(160deg,#241845,#3a2a66)" },
-  keyring:  { name: "NFC Keyring (3-pack) — Shared Profile",    price: 99,  thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
-  keyring3: { name: "NFC Keyring (3-pack) — Separate Profiles", price: 160, thumb: "linear-gradient(160deg,#3a2a66,#241845)" },
-};
 const CART_KEY = "eb_cart";
 const $ = id => document.getElementById(id);
 let cart = [];
